@@ -12,16 +12,20 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&family=Cormorant+SC:wght@500;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
 <style>
-/* Layout: one narrow night column; the generated graveyard picture is the hero, controls above, epitaph list below. */
+/* Layout: a moonlit hero with an engraved stone slab as the form; the animated graveyard appears below only after digging. */
 :root {
-  --night: #0f0c17;
-  --panel: #191424;
-  --line: #2e2640;
-  --bone: #ece4d2;
-  --muted: #a297b4;
+  --night: #0b0913;
+  --night-2: #160f26;
+  --panel: #1a1428;
+  --line: #31284a;
+  --bone: #ede5d3;
+  --muted: #a99fbd;
   --pumpkin: #ff7a1a;
-  --slime: #a3d977;
+  --slime: #a8e07a;
   --blood: #ff6b6b;
+  --stone-hi: #a7a2b6;
+  --stone-lo: #6a6579;
+  --engrave: #241f2e;
   --f-display: "Rubik Wet Paint", "Alegreya Sans", system-ui, sans-serif;
   --f-stone: "Cormorant SC", "Cormorant", Georgia, serif;
   --f-body: "Alegreya Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -34,45 +38,156 @@ body {
   font-family: var(--f-body);
   font-size: 17px;
   line-height: 1.5;
+  overflow-x: hidden;
 }
-.wrap {
-  max-width: 1040px;
-  margin: 0 auto;
-  padding-block: 28px 56px;
+
+/* ---------- hero ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(ellipse 60% 45% at 50% 108%, rgba(255, 122, 26, .22), transparent 70%),
+    linear-gradient(180deg, #05050d 0%, #150e2c 55%, #2a1638 100%);
+  padding-block: 56px 190px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
-  display: grid;
-  gap: 22px;
 }
-header { display: grid; gap: 6px; }
+.hero-in {
+  position: relative;
+  z-index: 3;
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
+  gap: 18px;
+}
+.stars, .moon, .fog, .bat, .ground, .lantern { position: absolute; pointer-events: none; }
+.stars {
+  inset: 0;
+  z-index: 0;
+  background-image:
+    radial-gradient(1.2px 1.2px at 12% 18%, #fff8e0, transparent),
+    radial-gradient(1px 1px at 27% 8%, #fff8e0, transparent),
+    radial-gradient(1.4px 1.4px at 44% 22%, #fff8e0, transparent),
+    radial-gradient(1px 1px at 63% 12%, #fff8e0, transparent),
+    radial-gradient(1.3px 1.3px at 81% 30%, #fff8e0, transparent),
+    radial-gradient(1px 1px at 92% 9%, #fff8e0, transparent),
+    radial-gradient(1px 1px at 6% 40%, #fff8e0, transparent),
+    radial-gradient(1.2px 1.2px at 55% 38%, #fff8e0, transparent),
+    radial-gradient(1px 1px at 35% 45%, #fff8e0, transparent),
+    radial-gradient(1.1px 1.1px at 72% 48%, #fff8e0, transparent);
+  opacity: .8;
+}
+.moon {
+  z-index: 0;
+  width: clamp(130px, 22vw, 230px);
+  aspect-ratio: 1;
+  max-width: 100%;
+  right: 8%;
+  top: 40px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 36%, rgba(170, 140, 90, .25) 0 9%, transparent 10%),
+    radial-gradient(circle at 62% 58%, rgba(170, 140, 90, .22) 0 13%, transparent 14%),
+    radial-gradient(circle at 44% 72%, rgba(170, 140, 90, .2) 0 6%, transparent 7%),
+    radial-gradient(circle at 38% 34%, #fff7de, #ecd39b 70%);
+  box-shadow: 0 0 60px 20px rgba(255, 220, 160, .22), 0 0 180px 60px rgba(255, 170, 90, .12);
+}
+.fog {
+  z-index: 2;
+  left: -50%;
+  width: 200%;
+  height: 120px;
+  background:
+    radial-gradient(ellipse 18% 50% at 10% 50%, rgba(190, 220, 205, .16), transparent 70%),
+    radial-gradient(ellipse 14% 45% at 32% 60%, rgba(190, 220, 205, .13), transparent 70%),
+    radial-gradient(ellipse 20% 50% at 58% 45%, rgba(190, 220, 205, .15), transparent 70%),
+    radial-gradient(ellipse 16% 45% at 82% 55%, rgba(190, 220, 205, .12), transparent 70%);
+}
+.fog.f1 { bottom: 60px; }
+.fog.f2 { bottom: 10px; opacity: .8; transform: scaleX(-1); }
+.bat { z-index: 1; width: 46px; color: #07060b; top: 0; left: 0; }
+.bat svg { width: 100%; height: auto; display: block; }
+.ground { z-index: 2; left: 0; right: 0; bottom: -1px; height: 170px; color: #08060d; }
+.ground svg { width: 100%; height: 100%; display: block; }
+.lantern {
+  inset: 0;
+  z-index: 2;
+  background: radial-gradient(circle 240px at var(--mx, 72%) var(--my, 32%), rgba(255, 190, 110, .09), transparent 60%, rgba(3, 2, 8, .35) 100%);
+}
+
+.kicker {
+  margin: 0;
+  font-size: 13px;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--pumpkin);
+}
 h1 {
   font-family: var(--f-display);
   font-weight: 400;
-  font-size: clamp(38px, 7vw, 68px);
-  line-height: 1.05;
+  font-size: clamp(52px, 11vw, 124px);
+  line-height: .92;
   margin: 0;
   color: var(--pumpkin);
-  text-shadow: 0 0 24px rgba(255, 122, 26, .35);
+  text-shadow: 0 0 28px rgba(255, 122, 26, .45), 0 4px 0 #3a1500;
   text-wrap: balance;
 }
-.lede { margin: 0; color: var(--muted); max-width: 62ch; }
-form {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+h1 span { color: var(--slime); text-shadow: 0 0 26px rgba(168, 224, 122, .45), 0 4px 0 #17300a; }
+.lede { margin: 0; color: var(--muted); max-width: 54ch; font-size: 19px; }
+
+/* the slab */
+.slab {
+  margin-top: 10px;
+  max-width: 640px;
+  position: relative;
+  display: grid;
+  gap: 12px;
+  padding: 58px 28px 26px;
+  border-radius: 320px 320px 14px 14px / 150px 150px 14px 14px;
+  background:
+    radial-gradient(circle at 20% 80%, rgba(96, 130, 70, .35) 0 6%, transparent 7%),
+    radial-gradient(circle at 12% 92%, rgba(96, 130, 70, .4) 0 8%, transparent 9%),
+    radial-gradient(circle at 88% 95%, rgba(96, 130, 70, .3) 0 5%, transparent 6%),
+    linear-gradient(160deg, var(--stone-hi), var(--stone-lo));
+  border: 3px solid #2b2737;
+  box-shadow: 10px 12px 0 rgba(0, 0, 0, .45), inset 0 0 0 6px rgba(255, 255, 255, .06), inset 0 0 0 8px rgba(0, 0, 0, .12);
+  color: var(--engrave);
 }
-.field { flex: 1 1 320px; min-width: 0; display: grid; gap: 4px; }
-label { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+.slab::before {
+  content: "R.I.P.";
+  position: absolute;
+  top: 18px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-family: var(--f-stone);
+  font-weight: 700;
+  letter-spacing: .3em;
+  font-size: 18px;
+  color: var(--engrave);
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, .25);
+}
+.slab label {
+  font-family: var(--f-stone);
+  font-weight: 700;
+  font-size: 24px;
+  text-align: center;
+  text-shadow: 1px 1px 0 rgba(255, 255, 255, .25);
+}
+.row { display: flex; flex-wrap: wrap; gap: 10px; }
+.row > input { flex: 1 1 260px; min-width: 0; }
 input[type="text"] {
-  width: 100%;
   box-sizing: border-box;
   font: inherit;
   color: var(--bone);
-  background: var(--panel);
-  border: 1px solid var(--line);
+  background: rgba(20, 15, 30, .82);
+  border: 1px solid #2b2737;
   border-radius: 10px;
-  padding: 12px 14px;
+  padding: 13px 14px;
+  box-shadow: inset 0 2px 6px rgba(0, 0, 0, .6);
 }
+input[type="text"]::placeholder { color: #8b829d; }
 input[type="text"]:focus-visible { outline: 2px solid var(--pumpkin); outline-offset: 2px; }
 button {
   font: inherit;
@@ -83,105 +198,178 @@ button {
   border: 1px solid var(--line);
   background: var(--panel);
   color: var(--bone);
+  transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
 }
-button:hover { border-color: var(--muted); }
+button:hover { border-color: var(--muted); transform: translateY(-1px); }
 button:focus-visible { outline: 2px solid var(--pumpkin); outline-offset: 2px; }
-button:disabled { opacity: .55; cursor: progress; }
-button.primary {
-  align-self: end;
+button:disabled { opacity: .6; cursor: progress; transform: none; }
+button.dig {
   background: var(--pumpkin);
-  border-color: var(--pumpkin);
+  border-color: #b34d00;
   color: #1a0d02;
+  font-size: 18px;
+  padding-inline: 26px;
+  box-shadow: 0 0 22px rgba(255, 122, 26, .45);
 }
-button.primary:hover { filter: brightness(1.08); }
+button.dig:hover { box-shadow: 0 0 34px rgba(255, 122, 26, .7); }
 .examples { display: flex; flex-wrap: wrap; gap: 8px; font-size: 14px; color: var(--muted); align-items: center; }
-.examples button { padding: 4px 10px; font-weight: 500; font-size: 14px; border-radius: 999px; }
-.status { min-height: 1.5em; margin: 0; color: var(--muted); }
+.examples button { padding: 5px 12px; font-weight: 500; font-size: 14px; border-radius: 999px; background: rgba(26, 20, 40, .7); }
+.status { min-height: 1.5em; margin: 0; color: var(--muted); font-size: 16px; }
 .status.err { color: var(--blood); }
-.status.ok { color: var(--slime); }
-figure { margin: 0; display: grid; gap: 12px; }
+.status.busy::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: dots 1.2s steps(4) infinite; }
+@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+
+/* ---------- result ---------- */
+.result {
+  background: linear-gradient(180deg, #08060d, var(--night) 240px);
+  padding-block: 8px 64px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+}
+.result-in { max-width: 1040px; margin: 0 auto; display: grid; gap: 20px; }
+.result h2 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(32px, 5vw, 48px);
+  margin: 0;
+  color: var(--slime);
+  text-shadow: 0 0 20px rgba(168, 224, 122, .35);
+  overflow-wrap: anywhere;
+}
+.frame {
+  border-radius: 16px;
+  padding: 6px;
+  background: linear-gradient(140deg, #3b2b19, #1c140c 40%, #3b2b19);
+  box-shadow: 0 0 0 1px #000, 0 20px 60px rgba(0, 0, 0, .6), 0 0 80px rgba(255, 122, 26, .12);
+}
 canvas {
   width: 100%;
   max-width: 100%;
   height: auto;
   display: block;
-  border-radius: 14px;
-  border: 1px solid var(--line);
+  border-radius: 11px;
   background: #120d1c;
 }
 .actions { display: flex; flex-wrap: wrap; gap: 10px; }
-.badge {
-  display: inline-block;
-  font-size: 12px;
-  letter-spacing: .08em;
-  text-transform: uppercase;
-  padding: 2px 8px;
-  border-radius: 999px;
-  border: 1px solid var(--pumpkin);
-  color: var(--pumpkin);
-  vertical-align: middle;
-}
-.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+.actions .hot { border-color: var(--slime); color: var(--slime); }
+.toast { color: var(--slime); font-size: 15px; min-height: 1.4em; margin: 0; }
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 28px; margin-top: 8px; }
 .cols > section { min-width: 0; }
-h2 { font-family: var(--f-stone); font-weight: 700; font-size: 24px; margin: 0 0 8px; letter-spacing: .03em; }
+h3 { font-family: var(--f-stone); font-weight: 700; font-size: 26px; margin: 0 0 10px; letter-spacing: .03em; }
 ul.graves { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
 ul.graves li { display: flex; gap: 10px; justify-content: space-between; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
 ul.graves li span:first-child { min-width: 0; overflow-wrap: anywhere; }
 ul.graves .d { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
 ul.graves .z { color: var(--slime); }
-.rules { margin: 0; padding-left: 1.1em; color: var(--muted); }
+.rules { margin: 0; padding-left: 1.1em; color: var(--muted); display: grid; gap: 6px; }
 .rules b { color: var(--bone); font-weight: 500; }
-.toast { color: var(--slime); font-size: 15px; min-height: 1.4em; margin: 0; }
-footer { color: var(--muted); font-size: 14px; }
+
 @media (prefers-reduced-motion: no-preference) {
-  canvas.fresh { animation: rise .6s ease-out; }
-  @keyframes rise { from { opacity: .4; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  .moon { animation: moonGlow 6s ease-in-out infinite alternate; }
+  @keyframes moonGlow { to { box-shadow: 0 0 80px 28px rgba(255, 220, 160, .3), 0 0 220px 80px rgba(255, 170, 90, .16); } }
+  .fog.f1 { animation: drift 38s linear infinite; }
+  .fog.f2 { animation: drift2 52s linear infinite; }
+  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(25%); } }
+  @keyframes drift2 { from { transform: scaleX(-1) translateX(0); } to { transform: scaleX(-1) translateX(25%); } }
+  .bat { animation: fly var(--dur, 14s) linear infinite; animation-delay: var(--delay, 0s); }
+  .bat svg { animation: flap .22s ease-in-out infinite alternate; transform-origin: 50% 40%; }
+  @keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(-.55); } }
+  @keyframes fly {
+    0% { transform: translate(105vw, var(--y0, 120px)) scale(var(--s, 1)); }
+    50% { transform: translate(50vw, var(--y1, 60px)) scale(var(--s, 1)); }
+    100% { transform: translate(-10vw, var(--y2, 140px)) scale(var(--s, 1)); }
+  }
+  .stars { animation: twinkle 4s ease-in-out infinite alternate; }
+  @keyframes twinkle { to { opacity: .45; } }
+  h1 { animation: flicker 7s infinite; }
+  @keyframes flicker { 0%, 91%, 95%, 100% { opacity: 1; } 92%, 94% { opacity: .55; } }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bat { display: none; }
+}
+@media (max-width: 560px) {
+  .hero { padding-block: 36px 150px; }
+  .ground { height: 120px; }
+  .moon { width: 110px; right: -24px; top: 14px; }
+  .slab { padding: 52px 18px 22px; border-radius: 200px 200px 12px 12px / 90px 90px 12px 12px; }
+  .slab label { font-size: 20px; }
 }
 </style>
 
-<div class="wrap">
-  <header>
-    <h1>Кладбище проектов</h1>
-    <p class="lede">Вставьте ссылку на профиль GitHub или GitLab. Мы найдём заброшенные репозитории, поставим каждому надгробие, а тем, кто внезапно ожил после долгой спячки, выдадим руку зомби из-под земли.</p>
-  </header>
+<section class="hero" id="hero">
+  <div class="stars" aria-hidden="true"></div>
+  <div class="moon" aria-hidden="true"></div>
+  <div class="bat" aria-hidden="true" style="--dur:16s;--delay:-3s;--y0:150px;--y1:70px;--y2:120px;--s:1"><svg viewBox="-36 -18 72 30"><path fill="currentColor" d="M0-4 6-9 14-12 26-16 34-6 27-5 22 1 17-2 12 5 6 2 0 6-6 2-12 5-17-2-22 1-27-5-34-6-26-16-14-12-6-9Z"/></svg></div>
+  <div class="bat" aria-hidden="true" style="--dur:21s;--delay:-11s;--y0:60px;--y1:130px;--y2:40px;--s:.7"><svg viewBox="-36 -18 72 30"><path fill="currentColor" d="M0-4 6-9 14-12 26-16 34-6 27-5 22 1 17-2 12 5 6 2 0 6-6 2-12 5-17-2-22 1-27-5-34-6-26-16-14-12-6-9Z"/></svg></div>
+  <div class="bat" aria-hidden="true" style="--dur:12s;--delay:-7s;--y0:210px;--y1:170px;--y2:230px;--s:.55"><svg viewBox="-36 -18 72 30"><path fill="currentColor" d="M0-4 6-9 14-12 26-16 34-6 27-5 22 1 17-2 12 5 6 2 0 6-6 2-12 5-17-2-22 1-27-5-34-6-26-16-14-12-6-9Z"/></svg></div>
+  <div class="fog f1" aria-hidden="true"></div>
+  <div class="ground" aria-hidden="true">
+    <svg viewBox="0 0 1200 170" preserveAspectRatio="xMidYMax slice">
+      <path fill="currentColor" d="M0 120 Q150 95 300 112 T600 108 T900 104 T1200 112 V170 H0Z"/>
+      <g fill="currentColor">
+        <path d="M80 118 V70 a28 28 0 0 1 56 0 V118Z"/>
+        <path d="M200 112 V82 h-14 v-12 h14 v-16 h12 v16 h14 v12 h-14 v30Z"/>
+        <path d="M300 114 V60 q22 -30 44 0 V114Z"/>
+        <path d="M455 110 V80 a20 20 0 0 1 40 0 V110Z"/>
+        <path d="M720 108 V64 a26 26 0 0 1 52 0 V108Z"/>
+        <path d="M850 106 V76 h-12 v-10 h12 v-14 h10 v14 h12 v10 h-12 v30Z"/>
+        <path d="M960 110 V58 q26 -34 52 0 V110Z"/>
+        <path d="M1110 114 V84 a18 18 0 0 1 36 0 V114Z"/>
+        <path d="M1040 112 L1036 30 L1020 10 M1036 30 L1060 6 M1038 60 L1070 40" stroke="currentColor" stroke-width="7" fill="none" stroke-linecap="round"/>
+      </g>
+      <g fill="currentColor">
+        <rect x="0" y="96" width="1200" height="3"/>
+        <path d="M10 120V92l3-8 3 8v28zM40 120V92l3-8 3 8v28zM560 116V88l3-8 3 8v28zM590 116V88l3-8 3 8v28zM620 116V88l3-8 3 8v28zM650 116V88l3-8 3 8v28zM1170 120V92l3-8 3 8v28z"/>
+      </g>
+    </svg>
+  </div>
+  <div class="fog f2" aria-hidden="true"></div>
+  <div class="lantern" aria-hidden="true"></div>
 
-  <form id="form" autocomplete="off">
-    <div class="field">
-      <label for="profile">Профиль</label>
-      <input type="text" id="profile" name="profile" placeholder="https://github.com/torvalds или https://gitlab.com/username" spellcheck="false">
-    </div>
-    <button class="primary" id="go" type="submit">Смотреть</button>
-  </form>
-  <div class="examples">Попробовать: <button type="button" data-q="https://github.com/torvalds">github.com/torvalds</button><button type="button" data-q="https://github.com/sindresorhus">github.com/sindresorhus</button><button type="button" data-q="https://gitlab.com/inkscape">gitlab.com/inkscape</button><button type="button" id="demoBtn">пример</button></div>
-  <p class="status" id="status" role="status" aria-live="polite"></p>
+  <div class="hero-in">
+    <p class="kicker">Ночь открытых могил · 31 октября</p>
+    <h1>Кладбище <span>проектов</span></h1>
+    <p class="lede">Вставь ссылку на свой GitHub или GitLab. Мы раскопаем репозитории, к которым ты давно не прикасался, и поставим каждому надгробие. А тот, кто вдруг ожил после долгой спячки, полезет из-под земли.</p>
+    <form class="slab" id="form" autocomplete="off">
+      <label for="profile">Чьи проекты хороним?</label>
+      <div class="row">
+        <input type="text" id="profile" name="profile" placeholder="github.com/ник или gitlab.com/ник" spellcheck="false" autocapitalize="off">
+        <button class="dig" id="go" type="submit">Раскопать</button>
+      </div>
+    </form>
+    <div class="examples">Чужие кладбища: <button type="button" data-q="https://github.com/torvalds">torvalds</button><button type="button" data-q="https://github.com/sindresorhus">sindresorhus</button><button type="button" data-q="https://gitlab.com/inkscape">gitlab.com/inkscape</button><button type="button" id="demoBtn">выдуманный пример</button></div>
+    <p class="status" id="status" role="status" aria-live="polite"></p>
+  </div>
+</section>
 
-  <figure>
-    <canvas id="scene" width="1200" height="960" aria-label="Кладбище проектов"></canvas>
+<section class="result" id="result" hidden>
+  <div class="result-in">
+    <h2 id="resultTitle">Кладбище</h2>
+    <div class="frame"><canvas id="scene" width="1200" height="960" aria-label="Кладбище проектов"></canvas></div>
     <div class="actions">
       <button type="button" id="saveBtn">Сохранить картинку</button>
+      <button type="button" id="videoBtn" class="hot">Сохранить видео</button>
       <button type="button" id="shareBtn">Поделиться</button>
       <button type="button" id="linkBtn">Скопировать ссылку</button>
     </div>
     <p class="toast" id="toast" aria-live="polite"></p>
-  </figure>
-
-  <div class="cols">
-    <section>
-      <h2 id="listTitle">Покойные</h2>
-      <ul class="graves" id="list"></ul>
-    </section>
-    <section>
-      <h2>Как мы хороним</h2>
-      <ul class="rules">
-        <li><b>Надгробие</b> получает репозиторий без коммитов 6 месяцев и дольше, а также всё, что лежит в архиве. На камне даты рождения и последнего коммита.</li>
-        <li><b>Рука зомби</b> торчит, если проект проспал 6+ месяцев, а потом в нём появился коммит за последние 45 дней.</li>
-        <li>Форки не считаются: чужих покойников не хороним.</li>
-        <li>Данные берутся из публичных API GitHub и GitLab прямо в браузере. Без токена GitHub даёт 60 запросов в час.</li>
-      </ul>
-    </section>
+    <div class="cols">
+      <section>
+        <h3 id="listTitle">Покойные</h3>
+        <ul class="graves" id="list"></ul>
+      </section>
+      <section>
+        <h3>Правила кладбища</h3>
+        <ul class="rules">
+          <li><b>Надгробие</b> получает репозиторий без коммитов 6 месяцев и дольше, а также всё, что лежит в архиве. На камне даты рождения и последнего коммита.</li>
+          <li><b>Рука зомби</b> лезет из земли, если проект проспал 6+ месяцев, а потом в нём появился коммит за последние 45 дней.</li>
+          <li><b>Призрак</b> висит над самым древним покойником.</li>
+          <li>Форки не считаются: чужих покойников не хороним. Без токена GitHub даёт 60 запросов в час.</li>
+        </ul>
+      </section>
+    </div>
   </div>
-  <footer>Ничего не сохраняется на сервере: картинка рисуется у вас в браузере.</footer>
-</div>
+</section>
 
 <script>
 (() => {
@@ -190,19 +378,23 @@ footer { color: var(--muted); font-size: 14px; }
   const RECENT_DAYS = 45;     // недавний коммит для зомби
   const MAX_ZOMBIE_CHECKS = 12;
   const W = 1200, H = 960;
+  const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const $ = (id) => document.getElementById(id);
   const canvas = $("scene");
-  const ctx = canvas.getContext("2d");
+  const mainCtx = canvas.getContext("2d");
+  let ctx = mainCtx;
   const statusEl = $("status");
   const toastEl = $("toast");
-  let current = null; // {who, hostLabel, hashName, graves, zombies, alive, demo, total}
+  let current = null;
+  let scene = null;
 
   // ---------- helpers ----------
   function hashStr(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
   function rngFrom(seed) { let a = seed >>> 0; return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   const pad = (n) => String(n).padStart(2, "0");
   const mmyyyy = (d) => `${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+  function plural(n, forms) { const a = Math.abs(n) % 100, b = a % 10; return forms[a > 10 && a < 20 ? 2 : b === 1 ? 0 : b >= 2 && b <= 4 ? 1 : 2]; }
   function span(days) {
     days = Math.max(0, Math.round(days));
     const y = Math.floor(days / 365), m = Math.floor((days % 365) / 30);
@@ -212,7 +404,10 @@ footer { color: var(--muted); font-size: 14px; }
     return `${days} дн.`;
   }
   function setStatus(text, kind) { statusEl.textContent = text; statusEl.className = "status" + (kind ? " " + kind : ""); }
-  function toast(text) { toastEl.textContent = text; clearTimeout(toast.t); toast.t = setTimeout(() => (toastEl.textContent = ""), 5000); }
+  function toast(text) { toastEl.textContent = text; clearTimeout(toast.t); toast.t = setTimeout(() => (toastEl.textContent = ""), 6000); }
+  function off() { const c = document.createElement("canvas"); c.width = W; c.height = H; return c; }
+  function withCtx(c, fn) { const prev = ctx; ctx = c.getContext("2d"); try { fn(); } finally { ctx = prev; } }
+  const EPITAPHS = ["ушёл за хлебом", "TODO: доделать", "у меня работало", "почти MVP", "fix: всё", "ждал рефакторинга", "покойся в main", "без тестов", "v0.0.1 навсегда", "звёзд не дождался", "merge conflict", "ещё вернусь", "кто-то же форкнет", "README обещал"];
 
   // ---------- parsing ----------
   function parseProfile(raw) {
@@ -235,7 +430,7 @@ footer { color: var(--muted); font-size: 14px; }
     let res;
     try { res = await fetch(url, { headers: { Accept: "application/json" } }); }
     catch (e) {
-      throw new FriendlyError("Браузер не пустил запрос к API. Если вы смотрите страницу в окне предпросмотра Claude, там внешние запросы закрыты: откройте версию страницы с хостинга. Пока можно посмотреть пример.");
+      throw new FriendlyError("Браузер не пустил запрос к API. В окне предпросмотра Claude внешние запросы закрыты, откройте сайт по обычной ссылке. Пока можно посмотреть выдуманный пример.");
     }
     if (res.status === 404) throw new FriendlyError("Такого профиля нет. Проверьте ссылку.");
     if (res.status === 403 || res.status === 429) throw new FriendlyError("API временно не отвечает: кончился лимит запросов без токена (60 в час для GitHub). Попробуйте через час.");
@@ -305,7 +500,7 @@ footer { color: var(--muted); font-size: 14px; }
       .slice(0, MAX_ZOMBIE_CHECKS);
     let done = 0;
     for (const r of candidates) {
-      onProgress?.(`Слушаем, не шевелится ли кто под землёй… ${++done}/${candidates.length}`);
+      onProgress?.(`Прикладываем ухо к земле, не шевелится ли кто: ${++done} из ${candidates.length}`);
       try {
         const dates = (await commitDates(r)).filter((d) => !isNaN(d)).sort((a, b) => b - a);
         const gap = zombieGap(dates, now);
@@ -348,66 +543,47 @@ footer { color: var(--muted); font-size: 14px; }
     return { who: "example-dev", hostLabel: "github.com", hashName: "", graves, zombies, alive, total: graves.length + zombies.length + alive.length, demo: true };
   }
 
-  // ---------- drawing ----------
+  // ---------- static drawing ----------
   const C = {
-    stoneHi: "#9b97a8", stoneLo: "#5c586b", stoneEdge: "#2b2737", engrave: "#26222e",
-    skin: "#93ab78", skinDark: "#5d7349", skinLine: "#1d2715", dirt: "#2b201c", dirtHi: "#3e2e27",
-    pumpkin: "#ff7a1a", slime: "#a3d977", bone: "#ece4d2",
+    stoneHi: "#b3aec4", stoneLo: "#5f5a70", stoneEdge: "#25212f", engrave: "#221e2b",
+    skin: "#93ab78", skinDark: "#5d7349", skinLine: "#1d2715", dirt: "#2a1f1b", dirtHi: "#3f2e26",
+    pumpkin: "#ff7a1a", slime: "#a8e07a", bone: "#ede5d3",
   };
+  const STONE_FONT = '"Cormorant SC", Georgia, serif';
+  const BODY_FONT = '"Alegreya Sans", system-ui, sans-serif';
+  const DISPLAY_FONT = '"Rubik Wet Paint", "Alegreya Sans", sans-serif';
+  const MOON = { x: 930, y: 190, r: 96 };
 
-  function drawSky(r) {
+  function drawSkyStatic() {
     const sky = ctx.createLinearGradient(0, 0, 0, 520);
-    sky.addColorStop(0, "#07060f"); sky.addColorStop(0.55, "#211836"); sky.addColorStop(1, "#57304a");
+    sky.addColorStop(0, "#05050e"); sky.addColorStop(0.5, "#1a1240"); sky.addColorStop(0.85, "#47224f"); sky.addColorStop(1, "#7a3242");
     ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
-    for (let i = 0; i < 160; i++) {
-      const x = r() * W, y = r() * 420, s = r() * 1.6 + 0.3;
-      ctx.fillStyle = `rgba(255,248,230,${0.25 + r() * 0.6})`;
-      ctx.fillRect(x, y, s, s);
-    }
-    // moon
-    const mx = 930, my = 175;
-    const glow = ctx.createRadialGradient(mx, my, 60, mx, my, 260);
-    glow.addColorStop(0, "rgba(255,226,170,.35)"); glow.addColorStop(1, "rgba(255,226,170,0)");
-    ctx.fillStyle = glow; ctx.fillRect(mx - 260, my - 260, 520, 520);
-    const moon = ctx.createRadialGradient(mx - 25, my - 25, 10, mx, my, 92);
-    moon.addColorStop(0, "#fff6dc"); moon.addColorStop(1, "#e7cf98");
-    ctx.fillStyle = moon; ctx.beginPath(); ctx.arc(mx, my, 90, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = "rgba(170,140,90,.28)";
-    [[-30, -20, 16], [25, 15, 22], [-10, 40, 11], [40, -35, 9], [-45, 25, 8]].forEach(([dx, dy, rr]) => { ctx.beginPath(); ctx.arc(mx + dx, my + dy, rr, 0, Math.PI * 2); ctx.fill(); });
-    // clouds across the moon
-    ctx.fillStyle = "rgba(20,14,32,.55)";
-    for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.ellipse(780 + i * 110 + r() * 40, 215 + r() * 40, 110 + r() * 60, 12 + r() * 8, 0, 0, Math.PI * 2); ctx.fill(); }
-    // bats
-    ctx.fillStyle = "#08060c";
-    for (let i = 0; i < 6; i++) bat(700 + r() * 380, 60 + r() * 230, 0.5 + r() * 0.7, r() * 0.6 - 0.3);
-  }
-
-  function bat(x, y, s, rot) {
-    const pts = [[0, -4], [6, -9], [14, -12], [26, -16], [34, -6], [27, -5], [22, 1], [17, -2], [12, 5], [6, 2], [0, 6]];
-    ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
-    ctx.beginPath(); ctx.moveTo(0, -4);
-    for (const [px, py] of pts) ctx.lineTo(px, py);
-    for (let i = pts.length - 1; i >= 0; i--) ctx.lineTo(-pts[i][0], pts[i][1]);
-    ctx.closePath(); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(0, 0, 4, 7, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.restore();
+    const hz = ctx.createRadialGradient(600, 520, 20, 600, 520, 620);
+    hz.addColorStop(0, "rgba(255,122,26,.35)"); hz.addColorStop(1, "rgba(255,122,26,0)");
+    ctx.fillStyle = hz; ctx.fillRect(0, 0, W, 560);
+    const glow = ctx.createRadialGradient(MOON.x, MOON.y, 60, MOON.x, MOON.y, 300);
+    glow.addColorStop(0, "rgba(255,226,170,.4)"); glow.addColorStop(1, "rgba(255,226,170,0)");
+    ctx.fillStyle = glow; ctx.fillRect(MOON.x - 300, MOON.y - 300, 600, 600);
+    const moon = ctx.createRadialGradient(MOON.x - 28, MOON.y - 28, 10, MOON.x, MOON.y, MOON.r + 2);
+    moon.addColorStop(0, "#fff7de"); moon.addColorStop(1, "#ecc98a");
+    ctx.fillStyle = moon; ctx.beginPath(); ctx.arc(MOON.x, MOON.y, MOON.r, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "rgba(170,130,80,.25)";
+    [[-30, -20, 17], [26, 16, 23], [-10, 44, 12], [44, -36, 10], [-48, 26, 9], [10, -50, 7]].forEach(([dx, dy, rr]) => { ctx.beginPath(); ctx.arc(MOON.x + dx, MOON.y + dy, rr, 0, Math.PI * 2); ctx.fill(); });
   }
 
   function drawHills(r) {
     const layer = (base, amp, color, step) => {
       ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, H);
-      let y = base;
-      for (let x = 0; x <= W + step; x += step) { y = base + Math.sin(x / 170 + amp) * amp + (r() - 0.5) * 10; ctx.lineTo(x, y); }
+      for (let x = 0; x <= W + step; x += step) ctx.lineTo(x, base + Math.sin(x / 170 + amp) * amp + (r() - 0.5) * 10);
       ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
     };
-    layer(420, 22, "#1f1630", 40);
+    layer(420, 22, "#24163a", 40);
     // chapel on the far hill
-    ctx.fillStyle = "#170f24";
+    ctx.fillStyle = "#170e26";
     ctx.fillRect(250, 360, 70, 70); ctx.beginPath(); ctx.moveTo(244, 362); ctx.lineTo(285, 322); ctx.lineTo(326, 362); ctx.fill();
     ctx.fillRect(296, 300, 22, 70); ctx.beginPath(); ctx.moveTo(292, 302); ctx.lineTo(307, 270); ctx.lineTo(322, 302); ctx.fill();
     ctx.fillRect(305, 250, 4, 22); ctx.fillRect(299, 256, 16, 4);
-    ctx.fillStyle = "rgba(255,170,60,.7)"; ctx.fillRect(272, 380, 10, 16); ctx.fillRect(303, 318, 7, 10);
-    layer(462, 14, "#170f22", 30);
+    layer(462, 14, "#180f26", 30);
   }
 
   function drawTree(r) {
@@ -421,7 +597,9 @@ footer { color: var(--muted); font-size: 14px; }
       for (let i = 0; i < n; i++) branch(x2, y2, len * (0.62 + r() * 0.18), ang + (r() - 0.5) * 1.3, w * 0.66, depth - 1);
     };
     branch(95, 640, 150, -Math.PI / 2 + 0.08, 26, 8);
-    // a noose-less swing of a lantern? just a crow
+    // hollow with a glow
+    ctx.fillStyle = "#05030a"; ctx.beginPath(); ctx.ellipse(98, 560, 9, 15, 0, 0, Math.PI * 2); ctx.fill();
+    // crow
     ctx.fillStyle = "#0a0710";
     ctx.beginPath(); ctx.ellipse(175, 352, 14, 9, -0.2, 0, Math.PI * 2); ctx.fill();
     ctx.beginPath(); ctx.arc(187, 344, 6, 0, Math.PI * 2); ctx.fill();
@@ -430,7 +608,7 @@ footer { color: var(--muted); font-size: 14px; }
   }
 
   function drawFence(r) {
-    ctx.fillStyle = "#0c0913"; ctx.strokeStyle = "#0c0913";
+    ctx.fillStyle = "#0c0913";
     ctx.fillRect(0, 468, W, 4); ctx.fillRect(0, 494, W, 4);
     for (let x = 8; x < W; x += 24) {
       if (r() < 0.08) continue;
@@ -444,20 +622,20 @@ footer { color: var(--muted); font-size: 14px; }
 
   function drawGround() {
     const g = ctx.createLinearGradient(0, 480, 0, H);
-    g.addColorStop(0, "#1c1526"); g.addColorStop(1, "#0b0810");
+    g.addColorStop(0, "#1f1a2a"); g.addColorStop(0.5, "#141220"); g.addColorStop(1, "#0a0910");
     ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 505);
     for (let x = 0; x <= W; x += 60) ctx.lineTo(x, 500 + Math.sin(x / 90) * 6);
     ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill();
+    // moonlight pool
+    const pool = ctx.createRadialGradient(820, 640, 20, 820, 640, 460);
+    pool.addColorStop(0, "rgba(160,170,210,.10)"); pool.addColorStop(1, "rgba(160,170,210,0)");
+    ctx.fillStyle = pool; ctx.fillRect(0, 480, W, H - 480);
   }
 
-  function fog(y, alpha, r) {
-    for (let i = 0; i < 7; i++) {
-      const x = r() * W, rx = 180 + r() * 220;
-      const f = ctx.createRadialGradient(x, y, 0, x, y, rx);
-      f.addColorStop(0, `rgba(200,190,230,${alpha})`); f.addColorStop(1, "rgba(200,190,230,0)");
-      ctx.save(); ctx.translate(x, y); ctx.scale(1, 0.22); ctx.translate(-x, -y);
-      ctx.fillStyle = f; ctx.fillRect(x - rx, y - rx, rx * 2, rx * 2); ctx.restore();
-    }
+  function drawBushes(r) {
+    ctx.fillStyle = "#07060b";
+    const bush = (x, y, w) => { for (let i = 0; i < 7; i++) { ctx.beginPath(); ctx.arc(x + (r() - 0.5) * w, y - r() * w * 0.35, w * (0.18 + r() * 0.16), 0, Math.PI * 2); ctx.fill(); } };
+    bush(30, 600, 120); bush(1180, 620, 130); bush(0, 820, 150); bush(1200, 840, 160);
   }
 
   function grass(x, y, s, r, color) {
@@ -486,8 +664,14 @@ footer { color: var(--muted); font-size: 14px; }
 
   function engrave(text, x, y, font) {
     ctx.font = font;
-    ctx.fillStyle = "rgba(255,255,255,.22)"; ctx.fillText(text, x + 0.8, y + 1);
+    ctx.fillStyle = "rgba(255,255,255,.25)"; ctx.fillText(text, x + 0.8, y + 1);
     ctx.fillStyle = C.engrave; ctx.fillText(text, x, y);
+  }
+
+  function shrink(text, maxW, px, minPx, weight, family) {
+    for (; px > minPx; px--) { ctx.font = `${weight} ${px}px ${family}`; if (ctx.measureText(text).width <= maxW) break; }
+    ctx.font = `${weight} ${px}px ${family}`;
+    return px;
   }
 
   function fitName(name, maxW, maxPx, minPx) {
@@ -506,31 +690,39 @@ footer { color: var(--muted); font-size: 14px; }
     return { lines: lines.map((l) => { let t = l; while (ctx.measureText(t).width > maxW && t.length > 3) t = t.slice(0, -2) + "…"; return t; }), px };
   }
 
-  function drawStone(x, y, s, item, r) {
-    const w = 150 * s, h = 196 * s, type = Math.floor(r() * 3), tilt = (r() - 0.5) * 0.09;
+  function drawStone(x, y, s, item, r, ri, crow) {
+    const w = 150 * s, h = 196 * s, type = Math.floor(r() * 3), tilt = (r() - 0.5) * 0.1;
     ctx.save(); ctx.translate(x, y);
     // mound
-    ctx.fillStyle = C.dirt; ctx.beginPath(); ctx.ellipse(0, 6 * s, w * 0.62, 18 * s, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.fillStyle = C.dirtHi; ctx.beginPath(); ctx.ellipse(0, 2 * s, w * 0.5, 9 * s, 0, Math.PI, 0); ctx.fill();
+    ctx.fillStyle = C.dirt; ctx.beginPath(); ctx.ellipse(0, 6 * s, w * 0.64, 18 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = C.dirtHi; ctx.beginPath(); ctx.ellipse(0, 2 * s, w * 0.52, 9 * s, 0, Math.PI, 0); ctx.fill();
     ctx.rotate(tilt);
-    // shadow
-    ctx.save(); ctx.translate(7 * s, -3 * s); stonePath(type, w, h); ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fill(); ctx.restore();
+    ctx.save(); ctx.translate(-9 * s, -3 * s); stonePath(type, w, h); ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fill(); ctx.restore();
     stonePath(type, w, h);
-    const g = ctx.createLinearGradient(-w / 2, -h, w / 2, 0);
+    const g = ctx.createLinearGradient(w / 2, -h, -w / 2, 0);
     g.addColorStop(0, C.stoneHi); g.addColorStop(1, C.stoneLo);
     ctx.fillStyle = g; ctx.fill();
     ctx.lineWidth = 2.5 * s; ctx.strokeStyle = C.stoneEdge; ctx.stroke();
     ctx.save(); stonePath(type, w, h); ctx.clip();
-    for (let i = 0; i < 70; i++) { ctx.fillStyle = r() < 0.5 ? "rgba(0,0,0,.12)" : "rgba(255,255,255,.08)"; ctx.fillRect((r() - 0.5) * w, -r() * h, 2 * s, 2 * s); }
-    // moss
-    ctx.fillStyle = "rgba(96,130,70,.55)";
-    for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.arc((r() - 0.5) * w, -r() * 18 * s, (5 + r() * 9) * s, 0, Math.PI * 2); ctx.fill(); }
-    // crack
+    // moon rim light on the right edge
+    const rim = ctx.createLinearGradient(w * 0.2, 0, w / 2, 0);
+    rim.addColorStop(0, "rgba(255,226,170,0)"); rim.addColorStop(1, "rgba(255,226,170,.22)");
+    ctx.fillStyle = rim; ctx.fillRect(0, -h, w / 2, h);
+    for (let i = 0; i < 80; i++) { ctx.fillStyle = r() < 0.5 ? "rgba(0,0,0,.13)" : "rgba(255,255,255,.09)"; ctx.fillRect((r() - 0.5) * w, -r() * h, 2 * s, 2 * s); }
+    ctx.fillStyle = "rgba(96,140,70,.6)";
+    for (let i = 0; i < 7; i++) { ctx.beginPath(); ctx.arc((r() - 0.5) * w, -r() * 20 * s, (5 + r() * 9) * s, 0, Math.PI * 2); ctx.fill(); }
     if (r() < 0.6) {
       ctx.strokeStyle = "rgba(30,26,38,.7)"; ctx.lineWidth = 1.3 * s; ctx.beginPath();
       let cx = (r() - 0.5) * w * 0.6, cy = -h * (0.55 + r() * 0.3); ctx.moveTo(cx, cy);
       for (let i = 0; i < 5; i++) { cx += (r() - 0.5) * 16 * s; cy += 10 * s; ctx.lineTo(cx, cy); }
       ctx.stroke();
+    }
+    // cobweb in the corner
+    if (r() < 0.35) {
+      ctx.strokeStyle = "rgba(230,230,240,.35)"; ctx.lineWidth = 0.8 * s;
+      const ox = -w / 2, oy = type === 2 ? -h * 0.74 : -h * 0.62, R = 34 * s;
+      for (let a = 0; a <= 4; a++) { const an = (a / 4) * Math.PI / 2; ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox + Math.cos(an) * R, oy + Math.sin(an) * R); ctx.stroke(); }
+      for (let k = 1; k <= 3; k++) { ctx.beginPath(); for (let a = 0; a <= 4; a++) { const an = (a / 4) * Math.PI / 2, rr = (R * k) / 3; const px = ox + Math.cos(an) * rr, py = oy + Math.sin(an) * rr; a ? ctx.lineTo(px, py) : ctx.moveTo(px, py); } ctx.stroke(); }
     }
     ctx.restore();
     // text
@@ -546,11 +738,67 @@ footer { color: var(--muted); font-size: 14px; }
       fit.lines.forEach((l, i) => engrave(l, 0, ty + i * fit.px * 1.05, `700 ${fit.px}px ${STONE_FONT}`));
       ty += (fit.lines.length - 1) * fit.px * 1.05 + 22 * s;
       engrave(`${mmyyyy(item.born)} – ${mmyyyy(item.last)}`, 0, ty, `500 ${Math.round(14 * s)}px ${STONE_FONT}`);
-      const note = item.archived ? "в архиве" : item.lang;
-      if (note) engrave(note.toLowerCase(), 0, ty + 18 * s, `500 ${Math.round(12.5 * s)}px ${STONE_FONT}`);
+      if (ri > 0) {
+        const ep = item.archived ? "сдан в архив" : EPITAPHS[hashStr(item.name) % EPITAPHS.length];
+        const px = shrink(ep, w * 0.8, Math.round(13 * s), Math.round(9 * s), "italic 400", BODY_FONT);
+        engrave(ep, 0, ty + 19 * s, `italic 400 ${px}px ${BODY_FONT}`);
+      }
+    }
+    if (crow) {
+      const top = type === 0 ? -h : type === 1 ? -h : -h * 0.74;
+      const cx = type === 2 ? w * 0.32 : 0;
+      ctx.fillStyle = "#08060c";
+      ctx.beginPath(); ctx.ellipse(cx, top - 12 * s, 15 * s, 10 * s, -0.25, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(cx + 13 * s, top - 22 * s, 7 * s, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx + 18 * s, top - 23 * s); ctx.lineTo(cx + 29 * s, top - 19 * s); ctx.lineTo(cx + 18 * s, top - 18 * s); ctx.fill();
+      ctx.beginPath(); ctx.moveTo(cx - 12 * s, top - 10 * s); ctx.lineTo(cx - 30 * s, top - 2 * s); ctx.lineTo(cx - 12 * s, top - 4 * s); ctx.fill();
+      ctx.fillStyle = "#ffcf4a"; ctx.beginPath(); ctx.arc(cx + 15 * s, top - 24 * s, 1.6 * s, 0, Math.PI * 2); ctx.fill();
     }
     ctx.restore();
-    grass(x, y + 4 * s, s, r, "#2f3f27");
+    grass(x, y + 4 * s, s, r, "#33462a");
+  }
+
+  // ---------- animated pieces ----------
+  function bat(x, y, s, rot, flap) {
+    const pts = [[6, -9], [14, -12], [26, -16], [34, -6], [27, -5], [22, 1], [17, -2], [12, 5], [6, 2]];
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+    ctx.beginPath(); ctx.moveTo(0, -4);
+    for (const [px, py] of pts) ctx.lineTo(px, py * flap);
+    ctx.lineTo(0, 6);
+    for (let i = pts.length - 1; i >= 0; i--) ctx.lineTo(-pts[i][0], pts[i][1] * flap);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 0, 4, 7, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function makeFogSprite() {
+    const c = document.createElement("canvas"); c.width = 512; c.height = 128;
+    const g = c.getContext("2d");
+    const f = g.createRadialGradient(256, 64, 0, 256, 64, 256);
+    f.addColorStop(0, "rgba(195,225,210,1)"); f.addColorStop(1, "rgba(195,225,210,0)");
+    g.save(); g.scale(1, 0.25); g.fillStyle = f; g.fillRect(0, 0, 512, 512); g.restore();
+    return c;
+  }
+  const FOG = makeFogSprite();
+
+  function fogBand(t, y, alpha, speed, seed) {
+    ctx.save(); ctx.globalAlpha = alpha;
+    for (let i = 0; i < 6; i++) {
+      const span = W + 700;
+      const x = (((seed * 97 + i * 260 + t * speed) % span) + span) % span - 400;
+      const w = 520 + ((seed + i * 37) % 5) * 60;
+      ctx.drawImage(FOG, x, y - 40 + ((i * 13) % 20), w, 110);
+    }
+    ctx.restore();
+  }
+
+  function handParams(r) {
+    return {
+      tilt: (r() - 0.5) * 0.3, ph: r() * 10,
+      clods: Array.from({ length: 9 }, () => [r() - 0.5, r() * 10 - 2, 3 + r() * 6, r() < 0.5]),
+      teeth: Array.from({ length: 7 }, () => r() * 6),
+      grass: r() * 1e9,
+    };
   }
 
   function finger(len, w, curl) {
@@ -561,29 +809,38 @@ footer { color: var(--muted); font-size: 14px; }
     ctx.restore();
   }
 
-  function drawHand(x, y, s, item, r) {
+  function drawHand(h, t, rise) {
+    const { x, y, s, it: item, prm } = h;
     ctx.save(); ctx.translate(x, y);
-    const glow = ctx.createRadialGradient(0, -80 * s, 0, 0, -80 * s, 150 * s);
-    glow.addColorStop(0, "rgba(163,217,119,.28)"); glow.addColorStop(1, "rgba(163,217,119,0)");
-    ctx.fillStyle = glow; ctx.fillRect(-150 * s, -230 * s, 300 * s, 260 * s);
+    const pulse = 0.22 + 0.08 * Math.sin(t * 2 + prm.ph);
+    const glow = ctx.createRadialGradient(0, -80 * s, 0, 0, -80 * s, 160 * s);
+    glow.addColorStop(0, `rgba(168,224,122,${pulse})`); glow.addColorStop(1, "rgba(168,224,122,0)");
+    ctx.fillStyle = glow; ctx.fillRect(-160 * s, -240 * s, 320 * s, 270 * s);
     ctx.fillStyle = C.dirt; ctx.beginPath(); ctx.ellipse(0, 4 * s, 80 * s, 20 * s, 0, 0, Math.PI * 2); ctx.fill();
 
-    ctx.save(); ctx.rotate((r() - 0.5) * 0.3);
+    ctx.save();
+    ctx.beginPath(); ctx.rect(-200 * s, -400 * s, 400 * s, 406 * s); ctx.clip();
+    ctx.translate(0, (1 - rise) * 190 * s);
+    const sway = Math.sin(t * 1.3 + prm.ph) * 0.13;
+    ctx.rotate(prm.tilt + sway);
     const aw = 30 * s, ah = 112 * s;
     const sk = ctx.createLinearGradient(-aw, 0, aw, 0);
     sk.addColorStop(0, C.skinDark); sk.addColorStop(0.5, C.skin); sk.addColorStop(1, C.skinDark);
     ctx.fillStyle = sk; ctx.strokeStyle = C.skinLine; ctx.lineWidth = 2.2 * s;
     ctx.beginPath(); ctx.moveTo(-aw / 2 - 3 * s, 4 * s); ctx.quadraticCurveTo(-aw / 2 - 5 * s, -ah * 0.5, -aw * 0.42, -ah);
     ctx.lineTo(aw * 0.42, -ah); ctx.quadraticCurveTo(aw / 2 + 4 * s, -ah * 0.5, aw / 2 + 3 * s, 4 * s); ctx.closePath(); ctx.fill(); ctx.stroke();
-    // stitches
     ctx.strokeStyle = "#2a2a1e"; ctx.lineWidth = 1.4 * s; ctx.beginPath(); ctx.moveTo(-8 * s, -ah * 0.55); ctx.lineTo(9 * s, -ah * 0.62); ctx.stroke();
-    for (let i = 0; i < 4; i++) { const t = i / 3, sx = -8 * s + 17 * s * t, sy = -ah * 0.55 - 0.07 * ah * t; ctx.beginPath(); ctx.moveTo(sx - 1 * s, sy - 4 * s); ctx.lineTo(sx + 1 * s, sy + 4 * s); ctx.stroke(); }
-    // palm
-    ctx.save(); ctx.translate(0, -ah - 14 * s);
-    ctx.fillStyle = C.skin; ctx.strokeStyle = C.skinLine; ctx.lineWidth = 2.2 * s;
+    for (let i = 0; i < 4; i++) { const k = i / 3, sx = -8 * s + 17 * s * k, sy = -ah * 0.55 - 0.07 * ah * k; ctx.beginPath(); ctx.moveTo(sx - 1 * s, sy - 4 * s); ctx.lineTo(sx + 1 * s, sy + 4 * s); ctx.stroke(); }
+    // palm and grasping fingers
+    ctx.save(); ctx.translate(0, -ah - 14 * s); ctx.rotate(Math.sin(t * 1.9 + prm.ph) * 0.12);
+    ctx.strokeStyle = C.skinLine; ctx.lineWidth = 2.2 * s;
     const fl = [34, 42, 40, 32].map((v) => v * s), fa = [-0.42, -0.14, 0.12, 0.38], fc = [-0.35, -0.15, 0.2, 0.45];
-    fa.forEach((a, i) => { ctx.save(); ctx.translate((i - 1.5) * 9.5 * s, -10 * s); ctx.rotate(a); ctx.fillStyle = C.skin; finger(fl[i], 10 * s, fc[i] * (0.7 + r() * 0.6)); ctx.restore(); });
-    ctx.save(); ctx.translate(-17 * s, 10 * s); ctx.rotate(-1.05); ctx.fillStyle = C.skin; finger(28 * s, 11 * s, 0.4); ctx.restore();
+    const grip = 0.5 + 0.5 * Math.sin(t * 2.4 + prm.ph);
+    fa.forEach((a, i) => {
+      ctx.save(); ctx.translate((i - 1.5) * 9.5 * s, -10 * s); ctx.rotate(a + Math.sin(t * 3 + i + prm.ph) * 0.06);
+      ctx.fillStyle = C.skin; finger(fl[i], 10 * s, fc[i] + (grip - 0.3) * 0.9 * Math.sign(fc[i] || 1)); ctx.restore();
+    });
+    ctx.save(); ctx.translate(-17 * s, 10 * s); ctx.rotate(-1.05 + grip * 0.25); ctx.fillStyle = C.skin; finger(28 * s, 11 * s, 0.4); ctx.restore();
     ctx.fillStyle = C.skin; ctx.beginPath(); ctx.ellipse(0, 6 * s, 20 * s, 26 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
     ctx.strokeStyle = "rgba(29,39,21,.55)"; ctx.lineWidth = 1.2 * s;
     for (let i = 0; i < 4; i++) { const kx = (i - 1.5) * 9.5 * s; ctx.beginPath(); ctx.moveTo(kx - 3 * s, -12 * s); ctx.lineTo(kx + 3 * s, -13 * s); ctx.stroke(); }
@@ -592,53 +849,118 @@ footer { color: var(--muted); font-size: 14px; }
     // torn sleeve
     ctx.fillStyle = "#3b2d4c"; ctx.strokeStyle = "#1a1224"; ctx.lineWidth = 1.5 * s;
     ctx.beginPath(); ctx.moveTo(-aw / 2 - 7 * s, 6 * s); ctx.lineTo(-aw / 2 - 6 * s, -34 * s);
-    const teeth = 6;
-    for (let i = 0; i <= teeth; i++) { const tx = -aw / 2 - 6 * s + ((aw + 12 * s) * i) / teeth; ctx.lineTo(tx, (i % 2 ? -46 : -34) * s - r() * 6 * s); }
+    prm.teeth.forEach((d, i) => { const tx = -aw / 2 - 6 * s + ((aw + 12 * s) * i) / 6; ctx.lineTo(tx, (i % 2 ? -46 : -34) * s - d * s); });
     ctx.lineTo(aw / 2 + 7 * s, 6 * s); ctx.closePath(); ctx.fill(); ctx.stroke();
     ctx.restore();
 
-    // dirt clods over the base
     ctx.fillStyle = C.dirtHi;
     ctx.beginPath(); ctx.ellipse(0, 6 * s, 54 * s, 12 * s, 0, Math.PI, 0); ctx.fill();
-    for (let i = 0; i < 9; i++) { ctx.fillStyle = r() < 0.5 ? C.dirt : C.dirtHi; ctx.beginPath(); ctx.arc((r() - 0.5) * 120 * s, (r() * 10 - 2) * s, (3 + r() * 6) * s, 0, Math.PI * 2); ctx.fill(); }
+    prm.clods.forEach(([dx, dy, rr, dark]) => { ctx.fillStyle = dark ? C.dirt : C.dirtHi; ctx.beginPath(); ctx.arc(dx * 120 * s, dy * s, rr * s, 0, Math.PI * 2); ctx.fill(); });
 
     // wooden sign
-    const sx = 92 * s, pw = 136 * s, ph = 58 * s;
-    ctx.fillStyle = "#4a3220"; ctx.fillRect(sx - 4 * s, -70 * s, 8 * s, 78 * s);
-    ctx.save(); ctx.translate(sx, -86 * s); ctx.rotate(0.06);
-    ctx.fillStyle = "#7a5634"; ctx.strokeStyle = "#2c1d10"; ctx.lineWidth = 2 * s;
-    ctx.beginPath(); ctx.roundRect(-pw / 2, -ph / 2, pw, ph, 4 * s); ctx.fill(); ctx.stroke();
-    ctx.strokeStyle = "rgba(44,29,16,.35)"; ctx.beginPath(); ctx.moveTo(-pw / 2 + 6 * s, -4 * s); ctx.lineTo(pw / 2 - 6 * s, -6 * s); ctx.stroke();
-    ctx.textAlign = "center"; ctx.fillStyle = "#1b120a";
-    const fit = fitName(item.name, pw * 0.88, Math.round(17 * s), Math.round(9 * s));
-    ctx.font = `700 ${fit.px}px ${STONE_FONT}`; ctx.fillText(fit.lines.join(""), 0, -6 * s);
-    ctx.font = `500 ${Math.round(13 * s)}px ${BODY_FONT}`; ctx.fillStyle = "#24170c";
-    ctx.fillText(`восстал после ${span(item.slept)}`, 0, 15 * s);
+    if (rise > 0.6) {
+      ctx.globalAlpha = Math.min(1, (rise - 0.6) / 0.4);
+      const sx = 92 * s, pw = 136 * s, ph = 58 * s;
+      ctx.fillStyle = "#4a3220"; ctx.fillRect(sx - 4 * s, -70 * s, 8 * s, 78 * s);
+      ctx.save(); ctx.translate(sx, -86 * s); ctx.rotate(0.06 + Math.sin(t * 0.8 + prm.ph) * 0.015);
+      ctx.fillStyle = "#7a5634"; ctx.strokeStyle = "#2c1d10"; ctx.lineWidth = 2 * s;
+      ctx.beginPath(); ctx.roundRect(-pw / 2, -ph / 2, pw, ph, 4 * s); ctx.fill(); ctx.stroke();
+      ctx.strokeStyle = "rgba(44,29,16,.35)"; ctx.beginPath(); ctx.moveTo(-pw / 2 + 6 * s, -4 * s); ctx.lineTo(pw / 2 - 6 * s, -6 * s); ctx.stroke();
+      ctx.textAlign = "center"; ctx.fillStyle = "#1b120a";
+      const fit = fitName(item.name, pw * 0.88, Math.round(17 * s), Math.round(9 * s));
+      ctx.font = `700 ${fit.px}px ${STONE_FONT}`; ctx.fillText(fit.lines.join(""), 0, -6 * s);
+      ctx.fillStyle = "#24170c";
+      shrink(`восстал после ${span(item.slept)}`, pw * 0.9, Math.round(13 * s), Math.round(8 * s), "500", BODY_FONT);
+      ctx.fillText(`восстал после ${span(item.slept)}`, 0, 15 * s);
+      ctx.restore();
+      ctx.globalAlpha = 1;
+    }
     ctx.restore();
-    ctx.restore();
-    grass(x - 40 * s, y + 6 * s, s, r, "#2f3f27");
+    grass(x - 40 * s, y + 6 * s, s, rngFrom(prm.grass), "#33462a");
   }
 
-  function pumpkin(x, y, s) {
+  function drawCandle(c, t) {
+    const { x, y, s, ph } = c;
+    const fl = 0.85 + 0.1 * Math.sin(t * 13 + ph) + 0.06 * Math.sin(t * 29 + ph * 2);
     ctx.save(); ctx.translate(x, y);
-    const glow = ctx.createRadialGradient(0, -20 * s, 0, 0, -20 * s, 90 * s);
-    glow.addColorStop(0, "rgba(255,150,40,.35)"); glow.addColorStop(1, "rgba(255,150,40,0)");
-    ctx.fillStyle = glow; ctx.fillRect(-90 * s, -110 * s, 180 * s, 180 * s);
+    const glow = ctx.createRadialGradient(0, -22 * s, 0, 0, -22 * s, 60 * s);
+    glow.addColorStop(0, `rgba(255,190,90,${0.35 * fl})`); glow.addColorStop(1, "rgba(255,190,90,0)");
+    ctx.fillStyle = glow; ctx.fillRect(-60 * s, -82 * s, 120 * s, 120 * s);
+    ctx.fillStyle = "#e9dcc0"; ctx.fillRect(-4 * s, -18 * s, 8 * s, 18 * s);
+    ctx.fillStyle = "#cdbf9f"; ctx.fillRect(1 * s, -18 * s, 3 * s, 18 * s);
+    ctx.fillStyle = "#ffd36b";
+    ctx.beginPath(); ctx.moveTo(0, -18 * s - 12 * s * fl); ctx.quadraticCurveTo(5 * s, -22 * s, 0, -17 * s); ctx.quadraticCurveTo(-5 * s, -22 * s, 0, -18 * s - 12 * s * fl); ctx.fill();
+    ctx.fillStyle = "#fff4d0"; ctx.beginPath(); ctx.ellipse(0, -21 * s, 1.6 * s, 3 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawGhost(g, t, a) {
+    const s = g.s * 1.1;
+    const x = g.x + Math.sin(t * 0.7) * 18 * s, y = g.y + Math.sin(t * 1.4) * 12 * s;
+    ctx.save(); ctx.translate(x, y); ctx.globalAlpha = a * (0.62 + 0.15 * Math.sin(t * 2.1));
+    ctx.shadowColor = "rgba(200,255,230,.8)"; ctx.shadowBlur = 30 * s;
+    const body = ctx.createLinearGradient(0, -60 * s, 0, 70 * s);
+    body.addColorStop(0, "rgba(245,255,250,1)"); body.addColorStop(1, "rgba(200,240,225,.15)");
+    ctx.fillStyle = body;
+    ctx.beginPath(); ctx.moveTo(-38 * s, 60 * s); ctx.lineTo(-40 * s, -20 * s); ctx.arc(0, -20 * s, 40 * s, Math.PI, 0); ctx.lineTo(38 * s, 60 * s);
+    for (let i = 0; i <= 6; i++) { const px = 38 * s - (76 * s * i) / 6; ctx.lineTo(px, 60 * s + Math.sin(t * 4 + i * 1.3) * 7 * s + (i % 2 ? 9 : 0) * s); }
+    ctx.closePath(); ctx.fill();
+    ctx.shadowBlur = 0;
+    // arms
+    ctx.beginPath(); ctx.ellipse(-44 * s, 6 * s + Math.sin(t * 2) * 4 * s, 14 * s, 7 * s, -0.6, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(44 * s, 2 * s - Math.sin(t * 2) * 4 * s, 14 * s, 7 * s, 0.6, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "#14101c";
+    ctx.beginPath(); ctx.ellipse(-14 * s, -24 * s, 7 * s, 10 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(14 * s, -24 * s, 7 * s, 10 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 2 * s, 6 * s, 8 * s + Math.sin(t * 3) * 2 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function pumpkin(x, y, s, t, ph) {
+    const fl = 0.8 + 0.12 * Math.sin(t * 9 + ph) + 0.08 * Math.sin(t * 23 + ph);
+    ctx.save(); ctx.translate(x, y);
+    const glow = ctx.createRadialGradient(0, -20 * s, 0, 0, -20 * s, 110 * s);
+    glow.addColorStop(0, `rgba(255,150,40,${0.42 * fl})`); glow.addColorStop(1, "rgba(255,150,40,0)");
+    ctx.fillStyle = glow; ctx.fillRect(-110 * s, -130 * s, 220 * s, 220 * s);
     ctx.fillStyle = "#3d5a26"; ctx.fillRect(-3 * s, -70 * s, 7 * s, 16 * s);
     [[-22, 30], [22, 30], [-10, 34], [10, 34], [0, 36]].forEach(([dx, rx]) => {
       ctx.fillStyle = Math.abs(dx) > 15 ? "#c9520c" : "#e8650f";
       ctx.beginPath(); ctx.ellipse(dx * s, -28 * s, rx * s, 32 * s, 0, 0, Math.PI * 2); ctx.fill();
     });
-    ctx.fillStyle = "#ffd257";
+    ctx.fillStyle = `rgb(255,${Math.round(190 + 50 * fl)},${Math.round(60 + 40 * fl)})`;
     ctx.beginPath(); ctx.moveTo(-22 * s, -38 * s); ctx.lineTo(-10 * s, -38 * s); ctx.lineTo(-16 * s, -50 * s); ctx.fill();
     ctx.beginPath(); ctx.moveTo(22 * s, -38 * s); ctx.lineTo(10 * s, -38 * s); ctx.lineTo(16 * s, -50 * s); ctx.fill();
     ctx.beginPath(); ctx.moveTo(-24 * s, -22 * s); ctx.lineTo(-14 * s, -14 * s); ctx.lineTo(-6 * s, -20 * s); ctx.lineTo(2 * s, -12 * s); ctx.lineTo(10 * s, -20 * s); ctx.lineTo(16 * s, -14 * s); ctx.lineTo(24 * s, -22 * s); ctx.quadraticCurveTo(0, -2 * s, -24 * s, -22 * s); ctx.fill();
     ctx.restore();
   }
 
-  const STONE_FONT = '"Cormorant SC", Georgia, serif';
-  const BODY_FONT = '"Alegreya Sans", system-ui, sans-serif';
-  const DISPLAY_FONT = '"Rubik Wet Paint", "Alegreya Sans", sans-serif';
+  function eyes(e, t) {
+    const blink = ((t + e.ph) % e.every) < 0.16;
+    if (blink) return;
+    ctx.save(); ctx.fillStyle = e.color; ctx.shadowColor = e.color; ctx.shadowBlur = 10;
+    for (const dx of [-e.gap / 2, e.gap / 2]) { ctx.beginPath(); ctx.ellipse(e.x + dx, e.y, e.r, e.r * 0.7, 0, 0, Math.PI * 2); ctx.fill(); }
+    ctx.restore();
+  }
+
+  function makeBolt() {
+    const pts = []; let x = 200 + Math.random() * 520, y = 0;
+    pts.push([x, y]);
+    while (y < 420) { x += (Math.random() - 0.5) * 70; y += 25 + Math.random() * 35; pts.push([x, y]); }
+    const branchAt = 2 + Math.floor(Math.random() * 3);
+    const br = [pts[branchAt]]; let bx = pts[branchAt][0], by = pts[branchAt][1];
+    for (let i = 0; i < 4; i++) { bx += 15 + Math.random() * 30; by += 20 + Math.random() * 20; br.push([bx, by]); }
+    return { pts, br };
+  }
+
+  function flashLevel(dt) {
+    if (dt < 0) return 0;
+    if (dt < 0.07) return 1;
+    if (dt < 0.15) return 0.25;
+    if (dt < 0.24) return 0.85;
+    return Math.max(0, 1 - (dt - 0.24) / 0.6) * 0.6;
+  }
+
+  // ---------- scene ----------
   const ROWS = [
     { y: 590, s: 0.6, max: 6 },
     { y: 712, s: 0.78, max: 5 },
@@ -647,14 +969,9 @@ footer { color: var(--muted); font-size: 14px; }
   const CAP = ROWS.reduce((a, b) => a + b.max, 0);
 
   function layout(items, r) {
-    // front row first, zombies get the best seats
     const rows = [[], [], []];
     let rest = items.slice(0, CAP);
-    for (let ri = 2; ri >= 0 && rest.length; ri--) {
-      const take = rest.slice(0, ROWS[ri].max);
-      rest = rest.slice(ROWS[ri].max);
-      rows[ri] = take;
-    }
+    for (let ri = 2; ri >= 0 && rest.length; ri--) { rows[ri] = rest.slice(0, ROWS[ri].max); rest = rest.slice(ROWS[ri].max); }
     const placed = [];
     rows.forEach((row, ri) => {
       if (!row.length) return;
@@ -666,52 +983,167 @@ footer { color: var(--muted); font-size: 14px; }
         let x = n === 1 ? W / 2 : left + step * i;
         if (n > 1 && n < ROWS[ri].max) x = W / 2 + (x - W / 2) * (0.45 + 0.55 * (n - 1) / (ROWS[ri].max - 1));
         x += (ri % 2 ? 40 : -10) * s + (r() - 0.5) * 30 * s;
-        placed.push({ it, x, y: y + (r() - 0.5) * 10 * s, s });
+        placed.push({ it, ri, x, y: y + (r() - 0.5) * 10 * s, s });
       });
     });
     return placed;
   }
 
-  function drawScene(data) {
-    const r = rngFrom(hashStr(data.who + data.hostLabel));
-    ctx.setTransform(1, 0, 0, 1, 0, 0);
-    ctx.clearRect(0, 0, W, H);
-    drawSky(r); drawHills(r); drawTree(r); drawFence(r); drawGround();
-    fog(520, 0.12, r);
+  function drawHeader(data) {
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.save();
+    ctx.shadowColor = "rgba(255,122,26,.7)"; ctx.shadowBlur = 22;
+    ctx.fillStyle = C.pumpkin; ctx.font = `68px ${DISPLAY_FONT}`;
+    ctx.fillText("Кладбище", 46, 96);
+    const w1 = ctx.measureText("Кладбище ").width;
+    ctx.shadowColor = "rgba(168,224,122,.7)"; ctx.fillStyle = C.slime;
+    ctx.fillText("проектов", 46 + w1, 96);
+    ctx.restore();
+    ctx.fillStyle = C.bone; ctx.font = `500 28px ${BODY_FONT}`;
+    ctx.fillText(`${data.who} · ${data.hostLabel}${data.demo ? " · выдуманный пример" : ""}`, 50, 136);
+    const extra = Math.max(0, data.graves.length + data.zombies.length - CAP);
+    const pills = [
+      [`${data.graves.length} ${plural(data.graves.length, ["надгробие", "надгробия", "надгробий"])}`, "#c9c3d8"],
+      [`${data.zombies.length} ${plural(data.zombies.length, ["восставший", "восставших", "восставших"])}`, C.slime],
+      [`${data.alive.length} ещё ${data.alive.length === 1 ? "дышит" : "дышат"}`, C.pumpkin],
+    ];
+    if (extra) pills.push([`${extra} не ${extra === 1 ? "влез" : "влезли"}`, "#8f86a3"]);
+    let px = 50;
+    ctx.font = `700 20px ${BODY_FONT}`;
+    for (const [text, color] of pills) {
+      const tw = ctx.measureText(text).width + 40;
+      ctx.fillStyle = "rgba(8,6,14,.55)"; ctx.strokeStyle = color; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.roundRect(px, 156, tw, 36, 18); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = color; ctx.beginPath(); ctx.arc(px + 16, 174, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = C.bone; ctx.fillText(text, px + 28, 181);
+      px += tw + 10;
+    }
+  }
 
+  function buildScene(data) {
+    const r = rngFrom(hashStr(data.who + data.hostLabel));
+    const bg = off();
+    withCtx(bg, () => { drawSkyStatic(); drawHills(r); drawTree(r); drawFence(r); drawGround(); drawBushes(r); });
     const items = [
       ...data.zombies.map((z) => ({ ...z, kind: "zombie" })),
       ...data.graves.map((g) => ({ ...g, kind: "grave" })),
     ];
     if (!items.length) items.push({ kind: "grave", empty: true });
     const placed = layout(items, r);
-    for (let ri = 0; ri < 3; ri++) {
-      placed.filter((p) => p.s === ROWS[ri].s).forEach((p) => p.it.kind === "zombie" ? drawHand(p.x, p.y, p.s * 1.3, p.it, r) : drawStone(p.x, p.y, p.s, p.it, r));
-      if (ri === 0) fog(640, 0.09, r);
-      if (ri === 1) fog(780, 0.07, r);
-    }
-    pumpkin(70, 930, 0.95); pumpkin(1135, 922, 0.75);
-
-    // title
-    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
-    ctx.shadowColor = "rgba(255,122,26,.6)"; ctx.shadowBlur = 18;
-    ctx.fillStyle = C.pumpkin; ctx.font = `64px ${DISPLAY_FONT}`;
-    ctx.fillText("Кладбище проектов", 48, 92);
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = C.bone; ctx.font = `500 28px ${BODY_FONT}`;
-    ctx.fillText(`${data.who} · ${data.hostLabel}${data.demo ? " · пример" : ""}`, 50, 132);
-
-    // footer
-    const fg = ctx.createLinearGradient(0, H - 90, 0, H);
-    fg.addColorStop(0, "rgba(8,6,12,0)"); fg.addColorStop(1, "rgba(8,6,12,.9)");
-    ctx.fillStyle = fg; ctx.fillRect(0, H - 90, W, 90);
-    const extra = Math.max(0, items.length - CAP);
-    const parts = [`Похоронено: ${data.graves.length}`, `Восстали: ${data.zombies.length}`, `Ещё дышат: ${data.alive.length}`];
-    if (extra) parts.push(`не влезли: ${extra}`);
-    ctx.font = `700 24px ${BODY_FONT}`; ctx.textAlign = "center"; ctx.fillStyle = C.bone;
-    ctx.fillText(parts.join("   ·   "), W / 2, H - 22);
-    canvas.classList.remove("fresh"); void canvas.offsetWidth; canvas.classList.add("fresh");
+    const rows = [off(), off(), off()];
+    const hands = [], candles = [];
+    let ghost = null;
+    const stones = placed.filter((p) => p.it.kind === "grave");
+    const crowOn = stones.length > 1 ? stones[Math.floor(r() * stones.length)] : null;
+    placed.forEach((p) => {
+      if (p.it.kind === "zombie") { const hs = p.s * 1.3; hands.push({ ...p, x: Math.min(Math.max(p.x, 90 * hs), W - 170 * hs), s: hs, prm: handParams(r) }); return; }
+      withCtx(rows[p.ri], () => drawStone(p.x, p.y, p.s, p.it, r, p.ri, p === crowOn));
+      if (!p.it.empty && p.ri > 0 && r() < 0.5) candles.push({ x: p.x + (r() < 0.5 ? -1 : 1) * 62 * p.s, y: p.y + 8 * p.s, s: p.s * 1.1, ph: r() * 10, ri: p.ri });
+      if (!p.it.empty && p.it === items.find((it) => it.kind === "grave")) ghost = { x: p.x, y: p.y - 250 * p.s, s: p.s, ri: p.ri };
+    });
+    const top = off();
+    withCtx(top, () => drawHeader(data));
+    return {
+      bg, rows, top, hands, candles, ghost,
+      stars: Array.from({ length: 170 }, () => ({ x: r() * W, y: r() * 430, s: r() * 1.7 + 0.3, a: 0.25 + r() * 0.6, ph: r() * 10, sp: 0.6 + r() * 2.5 })),
+      bats: Array.from({ length: 7 }, () => ({ cx: 620 + r() * 520, cy: 70 + r() * 230, ax: 60 + r() * 160, ay: 20 + r() * 40, sp: 0.15 + r() * 0.3, ph: r() * 10, s: 0.5 + r() * 0.7 })),
+      clouds: Array.from({ length: 6 }, () => ({ x: r() * W, y: 120 + r() * 200, rx: 120 + r() * 90, ry: 12 + r() * 10, sp: 6 + r() * 10 })),
+      eyes: [
+        { x: 98, y: 560, gap: 9, r: 2.6, color: "#ffcf4a", ph: 0.3, every: 4.2 },
+        { x: 40, y: 585, gap: 12, r: 3, color: "#c6ff6b", ph: 1.7, every: 5.3 },
+        { x: 1168, y: 600, gap: 12, r: 3, color: "#ff5a3c", ph: 2.9, every: 3.7 },
+        { x: 1150, y: 818, gap: 14, r: 3.4, color: "#ffcf4a", ph: 0.9, every: 6.1 },
+      ],
+      bolt: null, boltAt: 0.12, nextBolt: 7 + r() * 5,
+    };
   }
+
+  function reveal(t, ri) {
+    const start = 0.35 + ri * 0.3;
+    const k = Math.min(1, Math.max(0, (t - start) / 0.8));
+    return 1 - Math.pow(1 - k, 3);
+  }
+
+  function frame(t, opts = {}) {
+    const sc = scene; if (!sc) return;
+    ctx = mainCtx;
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.globalAlpha = 1;
+    ctx.drawImage(sc.bg, 0, 0);
+    // stars
+    for (const st of sc.stars) {
+      ctx.fillStyle = `rgba(255,248,230,${st.a * (0.55 + 0.45 * Math.sin(t * st.sp + st.ph))})`;
+      ctx.fillRect(st.x, st.y, st.s, st.s);
+    }
+    // lightning bolt behind clouds
+    let flash = 0;
+    if (!opts.still) {
+      if (t >= sc.boltAt && (!sc.bolt || sc.bolt.t0 !== sc.boltAt)) sc.bolt = { ...makeBolt(), t0: sc.boltAt };
+      if (sc.bolt) {
+        flash = flashLevel(t - sc.bolt.t0);
+        if (t - sc.bolt.t0 > 1.2) { sc.boltAt = sc.nextBolt; sc.nextBolt += 7 + Math.random() * 7; sc.bolt = null; }
+      }
+      if (sc.bolt && flash > 0.05) {
+        ctx.save(); ctx.strokeStyle = `rgba(235,235,255,${flash})`; ctx.shadowColor = "rgba(190,200,255,1)"; ctx.shadowBlur = 24; ctx.lineJoin = "round";
+        for (const [path, w] of [[sc.bolt.pts, 4], [sc.bolt.br, 2]]) { ctx.lineWidth = w; ctx.beginPath(); path.forEach(([px, py], i) => (i ? ctx.lineTo(px, py) : ctx.moveTo(px, py))); ctx.stroke(); }
+        ctx.restore();
+      }
+    }
+    // clouds
+    ctx.fillStyle = "rgba(24,16,40,.6)";
+    for (const c of sc.clouds) {
+      const x = ((c.x + t * c.sp) % (W + 500)) - 250;
+      ctx.beginPath(); ctx.ellipse(x, c.y, c.rx, c.ry, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.ellipse(x + c.rx * 0.5, c.y - c.ry * 0.6, c.rx * 0.6, c.ry * 0.9, 0, 0, Math.PI * 2); ctx.fill();
+    }
+    // bats
+    ctx.fillStyle = "#07060b";
+    for (const b of sc.bats) {
+      const x = b.cx + Math.sin(t * b.sp + b.ph) * b.ax, y = b.cy + Math.sin(t * b.sp * 1.7 + b.ph) * b.ay;
+      bat(x, y, b.s, Math.cos(t * b.sp + b.ph) * 0.25, Math.sin(t * 13 + b.ph * 3));
+    }
+    for (const e of sc.eyes) eyes(e, t);
+    fogBand(t, 530, 0.16, 9, 1);
+
+    for (let ri = 0; ri < 3; ri++) {
+      const a = opts.still ? 1 : reveal(t, ri);
+      if (a <= 0) continue;
+      const s = ROWS[ri].s;
+      ctx.save(); ctx.globalAlpha = a; ctx.translate(0, (1 - a) * 46 * s);
+      ctx.drawImage(sc.rows[ri], 0, 0);
+      ctx.restore();
+      for (const c of sc.candles) if (c.ri === ri) { ctx.globalAlpha = a; drawCandle(c, t); ctx.globalAlpha = 1; }
+      for (const h of sc.hands) if (h.ri === ri) {
+        const rise = opts.still ? 1 : Math.min(1, Math.max(0, (t - 1.4 - ri * 0.1) / 1.1));
+        drawHand(h, t, 1 - Math.pow(1 - rise, 2));
+      }
+      if (sc.ghost && sc.ghost.ri === ri) drawGhost(sc.ghost, t, opts.still ? 1 : Math.min(1, Math.max(0, (t - 2) / 1.2)));
+      if (ri === 0) fogBand(t, 650, 0.13, -7, 2);
+      if (ri === 1) fogBand(t, 790, 0.11, 11, 3);
+    }
+    pumpkin(70, 930, 0.95, t, 0); pumpkin(1135, 922, 0.75, t, 2.1);
+    fogBand(t, 910, 0.1, -5, 4);
+    ctx.drawImage(sc.top, 0, 0);
+    if (flash > 0) { ctx.fillStyle = `rgba(215,220,255,${0.3 * flash})`; ctx.fillRect(0, 0, W, H); }
+  }
+
+  let raf = 0, t0 = 0;
+  function loop(now) {
+    if (!scene) return;
+    frame((now - t0) / 1000);
+    raf = requestAnimationFrame(loop);
+  }
+  function startLoop() {
+    cancelAnimationFrame(raf);
+    if (REDUCED) { frame(10, { still: true }); return; }
+    t0 = performance.now();
+    raf = requestAnimationFrame(loop);
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (!scene || REDUCED) return;
+    if (document.hidden) cancelAnimationFrame(raf);
+    else { const elapsed = Math.max(4, (performance.now() - t0) / 1000); t0 = performance.now() - elapsed * 1000; raf = requestAnimationFrame(loop); }
+  });
 
   // ---------- page ----------
   function renderList(data) {
@@ -730,48 +1162,87 @@ footer { color: var(--muted); font-size: 14px; }
 
   function show(data) {
     current = data;
-    drawScene(data);
+    scene = buildScene(data);
+    $("result").hidden = false;
+    $("resultTitle").textContent = data.demo ? "Кладбище example-dev" : `Кладбище ${data.who}`;
     renderList(data);
-    canvas.setAttribute("aria-label", `Кладбище проектов ${data.who}: похоронено ${data.graves.length}, восстали ${data.zombies.length}, живы ${data.alive.length}`);
+    canvas.setAttribute("aria-label", `Кладбище проектов ${data.who}: надгробий ${data.graves.length}, восставших ${data.zombies.length}, живых ${data.alive.length}`);
+    startLoop();
+    requestAnimationFrame(() => $("result").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }));
   }
 
   async function run(raw) {
     const p = parseProfile(raw);
-    if (!p) { setStatus("Не узнаю ссылку. Нужна ссылка вида https://github.com/имя или https://gitlab.com/имя.", "err"); return; }
+    if (!p) { setStatus("Не узнаю ссылку. Нужна ссылка вида github.com/ник или gitlab.com/ник.", "err"); return; }
     $("go").disabled = true;
-    setStatus("Копаем…");
+    setStatus("Берём лопату и копаем", "busy");
     try {
-      const res = p.host === "github" ? await loadGitHub(p.user, (t) => setStatus(t)) : await loadGitLab(p.base, p.user, (t) => setStatus(t));
+      const res = p.host === "github" ? await loadGitHub(p.user, (t) => setStatus(t, "busy")) : await loadGitLab(p.base, p.user, (t) => setStatus(t, "busy"));
       const hostLabel = p.host === "github" ? "github.com" : p.base.replace(/^https:\/\//, "");
       const hashName = /^[A-Za-z0-9-]+$/.test(p.user) && (p.host === "github" || hostLabel === "gitlab.com") ? `${p.host}-${p.user}` : "";
-      show({ who: p.user, hostLabel, hashName, ...res, demo: false });
       if (hashName) { try { history.replaceState(null, "", "#" + hashName); } catch (e) {} }
-      setStatus(res.total ? `Готово: ${res.total} проектов, из них ${res.graves.length} на кладбище и ${res.zombies.length} восставших.` : "У этого профиля нет своих публичных проектов.", "ok");
+      setStatus(res.total ? `Раскопали ${res.total} ${plural(res.total, ["проект", "проекта", "проектов"])}.` : "У этого профиля нет своих публичных проектов.");
+      show({ who: p.user, hostLabel, hashName, ...res, demo: false });
     } catch (e) {
       setStatus(e instanceof FriendlyError ? e.message : "Что-то пошло не так: " + e.message, "err");
     } finally { $("go").disabled = false; }
   }
 
-  function toBlob() { return new Promise((res) => canvas.toBlob(res, "image/png")); }
-  const fileName = () => `graveyard-${(current?.who || "projects").replace(/[^A-Za-z0-9-]/g, "_")}.png`;
+  // ---------- saving and sharing ----------
+  function snapshotBlob() {
+    frame(Math.max(6, (performance.now() - t0) / 1000), { still: true });
+    return new Promise((res) => canvas.toBlob(res, "image/png"));
+  }
+  const baseName = () => `graveyard-${(current?.who || "projects").replace(/[^A-Za-z0-9-]/g, "_")}`;
   function shareLink() {
     const base = location.href.split("#")[0];
     return current?.hashName ? `${base}#${current.hashName}` : base;
   }
-  const shareText = () => current ? `Моё кладбище проектов: ${current.graves.length} надгробий и ${current.zombies.length} восставших 🎃` : "Кладбище проектов 🎃";
+  const shareText = () => current ? `Моё кладбище проектов: ${current.graves.length} ${plural(current.graves.length, ["надгробие", "надгробия", "надгробий"])} и ${current.zombies.length} ${plural(current.zombies.length, ["восставший", "восставших", "восставших"])} 🎃` : "Кладбище проектов 🎃";
 
-  async function saveImage() {
-    const blob = await toBlob();
+  async function offerFile(blob, filename) {
     const dl = window.claude?.use ? await window.claude.use("downloads").catch(() => null) : null;
     if (dl) {
-      try { await dl.save({ filename: fileName(), data: blob }); toast("Картинка сохранена."); }
-      catch (e) { if (e?.code !== "declined") toast("Сохранить не получилось. Можно сделать скриншот."); }
-      return;
+      try { await dl.save({ filename, data: blob }); return "saved"; }
+      catch (e) { return e?.code === "declined" ? "declined" : "failed"; }
     }
     const url = URL.createObjectURL(blob);
-    const a = document.createElement("a"); a.href = url; a.download = fileName(); document.body.append(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
-    toast("Картинка сохранена.");
+    const a = document.createElement("a"); a.href = url; a.download = filename; document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 8000);
+    return "saved";
+  }
+
+  async function saveImage() {
+    const res = await offerFile(await snapshotBlob(), baseName() + ".png");
+    if (res === "saved") toast("Картинка сохранена.");
+    else if (res === "failed") toast("Сохранить не получилось. Можно сделать скриншот.");
+  }
+
+  let recording = false;
+  async function saveVideo() {
+    if (recording) return;
+    const types = ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
+    const type = window.MediaRecorder && types.find((t) => MediaRecorder.isTypeSupported(t));
+    if (!type || !canvas.captureStream) { toast("Этот браузер не умеет записывать видео. Сохраните картинку."); return; }
+    recording = true;
+    const btn = $("videoBtn"); btn.disabled = true;
+    if (REDUCED) { t0 = performance.now(); raf = requestAnimationFrame(loop); }
+    else t0 = performance.now(); // restart so the clip opens with the lightning reveal
+    const stream = canvas.captureStream(30);
+    const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 5e6 });
+    const chunks = [];
+    rec.ondataavailable = (e) => e.data.size && chunks.push(e.data);
+    const done = new Promise((res) => (rec.onstop = res));
+    rec.start(250);
+    for (let left = 8; left > 0; left--) { btn.textContent = `Записываю… ${left}`; await new Promise((r) => setTimeout(r, 1000)); }
+    rec.stop(); await done;
+    stream.getTracks().forEach((tr) => tr.stop());
+    if (REDUCED) { cancelAnimationFrame(raf); frame(10, { still: true }); }
+    btn.textContent = "Сохранить видео"; btn.disabled = false; recording = false;
+    const ext = type.startsWith("video/mp4") ? "mp4" : "webm";
+    const res = await offerFile(new Blob(chunks, { type: type.split(";")[0] }), `${baseName()}.${ext}`);
+    if (res === "saved") toast(`Видео сохранено (${ext}).`);
+    else if (res === "failed") toast("Сохранить видео не получилось.");
   }
 
   async function copy(text) {
@@ -780,8 +1251,8 @@ footer { color: var(--muted); font-size: 14px; }
 
   async function share() {
     try {
-      const blob = await toBlob();
-      const file = new File([blob], fileName(), { type: "image/png" });
+      const blob = await snapshotBlob();
+      const file = new File([blob], baseName() + ".png", { type: "image/png" });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         await navigator.share({ files: [file], title: "Кладбище проектов", text: shareText() + " " + shareLink() });
         return;
@@ -789,37 +1260,45 @@ footer { color: var(--muted); font-size: 14px; }
       if (navigator.share) { await navigator.share({ title: "Кладбище проектов", text: shareText(), url: shareLink() }); return; }
     } catch (e) { if (e?.name === "AbortError") return; }
     const ok = await copy(shareText() + " " + shareLink());
-    toast(ok ? "Текст и ссылка скопированы: вставьте их в пост, а картинку прикрепите через «Сохранить картинку»." : "Поделиться отсюда не получилось. Сохраните картинку и прикрепите её к посту.");
+    toast(ok ? "Текст и ссылка скопированы. Картинку или видео прикрепите через кнопки сохранения." : "Поделиться отсюда не получилось. Сохраните картинку и прикрепите её к посту.");
   }
 
   $("form").addEventListener("submit", (e) => { e.preventDefault(); run($("profile").value); });
   document.querySelectorAll("[data-q]").forEach((b) => b.addEventListener("click", () => { $("profile").value = b.dataset.q; run(b.dataset.q); }));
-  $("demoBtn").addEventListener("click", () => { show(demoData()); setStatus("Это пример с выдуманными проектами.", ""); });
+  $("demoBtn").addEventListener("click", () => { setStatus("Это выдуманный пример, проекты ненастоящие."); show(demoData()); });
   $("saveBtn").addEventListener("click", saveImage);
+  $("videoBtn").addEventListener("click", saveVideo);
   $("shareBtn").addEventListener("click", share);
   $("linkBtn").addEventListener("click", async () => {
     const link = shareLink();
     toast((await copy(link)) ? "Ссылка скопирована." : "Скопируйте ссылку: " + link);
   });
 
+  // lantern follows the pointer over the hero
+  const hero = $("hero");
+  if (!REDUCED) hero.addEventListener("pointermove", (e) => {
+    const b = hero.getBoundingClientRect();
+    hero.style.setProperty("--mx", `${e.clientX - b.left}px`);
+    hero.style.setProperty("--my", `${e.clientY - b.top}px`);
+  });
+
+  function fromHash() {
+    const h = location.hash.slice(1).match(/^(github|gitlab)-([A-Za-z0-9-]+)$/);
+    return h ? `https://${h[1]}.com/${h[2]}` : null;
+  }
   async function boot() {
     try {
       await Promise.race([
-        Promise.all([`64px ${DISPLAY_FONT}`, `700 20px ${STONE_FONT}`, `500 20px ${STONE_FONT}`, `500 20px ${BODY_FONT}`, `700 20px ${BODY_FONT}`].map((f) => document.fonts.load(f, "Кладбище RIP"))),
+        Promise.all([`64px ${DISPLAY_FONT}`, `700 20px ${STONE_FONT}`, `500 20px ${STONE_FONT}`, `500 20px ${BODY_FONT}`, `700 20px ${BODY_FONT}`, `italic 400 20px ${BODY_FONT}`].map((f) => document.fonts.load(f, "Кладбище RIP"))),
         new Promise((res) => setTimeout(res, 2500)),
       ]);
     } catch (e) {}
-    show(demoData());
-    setStatus("Сейчас на картинке пример. Вставьте свой профиль и нажмите «Смотреть».");
-    const h = location.hash.slice(1).match(/^(github|gitlab)-([A-Za-z0-9-]+)$/);
-    if (h) {
-      const q = h[1] === "github" ? `https://github.com/${h[2]}` : `https://gitlab.com/${h[2]}`;
-      $("profile").value = q; run(q);
-    }
+    const q = fromHash();
+    if (q) { $("profile").value = q; run(q); }
   }
   window.addEventListener("hashchange", () => {
-    const h = location.hash.slice(1).match(/^(github|gitlab)-([A-Za-z0-9-]+)$/);
-    if (h && h[0] !== current?.hashName) { const q = `https://${h[1]}.com/${h[2]}`; $("profile").value = q; run(q); }
+    const q = fromHash();
+    if (q && location.hash.slice(1) !== current?.hashName) { $("profile").value = q; run(q); }
   });
   boot();
 })();

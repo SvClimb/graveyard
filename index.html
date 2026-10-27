@@ -1,0 +1,829 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<style>*{box-sizing:border-box}body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Кладбище проектов</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Rubik+Wet+Paint&family=Cormorant+SC:wght@500;700&family=Alegreya+Sans:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<style>
+/* Layout: one narrow night column; the generated graveyard picture is the hero, controls above, epitaph list below. */
+:root {
+  --night: #0f0c17;
+  --panel: #191424;
+  --line: #2e2640;
+  --bone: #ece4d2;
+  --muted: #a297b4;
+  --pumpkin: #ff7a1a;
+  --slime: #a3d977;
+  --blood: #ff6b6b;
+  --f-display: "Rubik Wet Paint", "Alegreya Sans", system-ui, sans-serif;
+  --f-stone: "Cormorant SC", "Cormorant", Georgia, serif;
+  --f-body: "Alegreya Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  color-scheme: dark;
+}
+html { background: var(--night); }
+body {
+  background: var(--night);
+  color: var(--bone);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.5;
+}
+.wrap {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: grid;
+  gap: 22px;
+}
+header { display: grid; gap: 6px; }
+h1 {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(38px, 7vw, 68px);
+  line-height: 1.05;
+  margin: 0;
+  color: var(--pumpkin);
+  text-shadow: 0 0 24px rgba(255, 122, 26, .35);
+  text-wrap: balance;
+}
+.lede { margin: 0; color: var(--muted); max-width: 62ch; }
+form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.field { flex: 1 1 320px; min-width: 0; display: grid; gap: 4px; }
+label { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+input[type="text"] {
+  width: 100%;
+  box-sizing: border-box;
+  font: inherit;
+  color: var(--bone);
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+input[type="text"]:focus-visible { outline: 2px solid var(--pumpkin); outline-offset: 2px; }
+button {
+  font: inherit;
+  font-weight: 700;
+  border-radius: 10px;
+  padding: 12px 20px;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--bone);
+}
+button:hover { border-color: var(--muted); }
+button:focus-visible { outline: 2px solid var(--pumpkin); outline-offset: 2px; }
+button:disabled { opacity: .55; cursor: progress; }
+button.primary {
+  align-self: end;
+  background: var(--pumpkin);
+  border-color: var(--pumpkin);
+  color: #1a0d02;
+}
+button.primary:hover { filter: brightness(1.08); }
+.examples { display: flex; flex-wrap: wrap; gap: 8px; font-size: 14px; color: var(--muted); align-items: center; }
+.examples button { padding: 4px 10px; font-weight: 500; font-size: 14px; border-radius: 999px; }
+.status { min-height: 1.5em; margin: 0; color: var(--muted); }
+.status.err { color: var(--blood); }
+.status.ok { color: var(--slime); }
+figure { margin: 0; display: grid; gap: 12px; }
+canvas {
+  width: 100%;
+  max-width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 14px;
+  border: 1px solid var(--line);
+  background: #120d1c;
+}
+.actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.badge {
+  display: inline-block;
+  font-size: 12px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--pumpkin);
+  color: var(--pumpkin);
+  vertical-align: middle;
+}
+.cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+.cols > section { min-width: 0; }
+h2 { font-family: var(--f-stone); font-weight: 700; font-size: 24px; margin: 0 0 8px; letter-spacing: .03em; }
+ul.graves { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+ul.graves li { display: flex; gap: 10px; justify-content: space-between; border-bottom: 1px dashed var(--line); padding-bottom: 6px; }
+ul.graves li span:first-child { min-width: 0; overflow-wrap: anywhere; }
+ul.graves .d { color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+ul.graves .z { color: var(--slime); }
+.rules { margin: 0; padding-left: 1.1em; color: var(--muted); }
+.rules b { color: var(--bone); font-weight: 500; }
+.toast { color: var(--slime); font-size: 15px; min-height: 1.4em; margin: 0; }
+footer { color: var(--muted); font-size: 14px; }
+@media (prefers-reduced-motion: no-preference) {
+  canvas.fresh { animation: rise .6s ease-out; }
+  @keyframes rise { from { opacity: .4; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+}
+</style>
+
+<div class="wrap">
+  <header>
+    <h1>Кладбище проектов</h1>
+    <p class="lede">Вставьте ссылку на профиль GitHub или GitLab. Мы найдём заброшенные репозитории, поставим каждому надгробие, а тем, кто внезапно ожил после долгой спячки, выдадим руку зомби из-под земли.</p>
+  </header>
+
+  <form id="form" autocomplete="off">
+    <div class="field">
+      <label for="profile">Профиль</label>
+      <input type="text" id="profile" name="profile" placeholder="https://github.com/torvalds или https://gitlab.com/username" spellcheck="false">
+    </div>
+    <button class="primary" id="go" type="submit">Смотреть</button>
+  </form>
+  <div class="examples">Попробовать: <button type="button" data-q="https://github.com/torvalds">github.com/torvalds</button><button type="button" data-q="https://github.com/sindresorhus">github.com/sindresorhus</button><button type="button" data-q="https://gitlab.com/inkscape">gitlab.com/inkscape</button><button type="button" id="demoBtn">пример</button></div>
+  <p class="status" id="status" role="status" aria-live="polite"></p>
+
+  <figure>
+    <canvas id="scene" width="1200" height="960" aria-label="Кладбище проектов"></canvas>
+    <div class="actions">
+      <button type="button" id="saveBtn">Сохранить картинку</button>
+      <button type="button" id="shareBtn">Поделиться</button>
+      <button type="button" id="linkBtn">Скопировать ссылку</button>
+    </div>
+    <p class="toast" id="toast" aria-live="polite"></p>
+  </figure>
+
+  <div class="cols">
+    <section>
+      <h2 id="listTitle">Покойные</h2>
+      <ul class="graves" id="list"></ul>
+    </section>
+    <section>
+      <h2>Как мы хороним</h2>
+      <ul class="rules">
+        <li><b>Надгробие</b> получает репозиторий без коммитов 6 месяцев и дольше, а также всё, что лежит в архиве. На камне даты рождения и последнего коммита.</li>
+        <li><b>Рука зомби</b> торчит, если проект проспал 6+ месяцев, а потом в нём появился коммит за последние 45 дней.</li>
+        <li>Форки не считаются: чужих покойников не хороним.</li>
+        <li>Данные берутся из публичных API GitHub и GitLab прямо в браузере. Без токена GitHub даёт 60 запросов в час.</li>
+      </ul>
+    </section>
+  </div>
+  <footer>Ничего не сохраняется на сервере: картинка рисуется у вас в браузере.</footer>
+</div>
+
+<script>
+(() => {
+  const DAY = 864e5;
+  const DEAD_DAYS = 180;      // без коммитов дольше — в могилу
+  const RECENT_DAYS = 45;     // недавний коммит для зомби
+  const MAX_ZOMBIE_CHECKS = 12;
+  const W = 1200, H = 960;
+
+  const $ = (id) => document.getElementById(id);
+  const canvas = $("scene");
+  const ctx = canvas.getContext("2d");
+  const statusEl = $("status");
+  const toastEl = $("toast");
+  let current = null; // {who, hostLabel, hashName, graves, zombies, alive, demo, total}
+
+  // ---------- helpers ----------
+  function hashStr(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
+  function rngFrom(seed) { let a = seed >>> 0; return () => { a |= 0; a = (a + 0x6D2B79F5) | 0; let t = Math.imul(a ^ (a >>> 15), 1 | a); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
+  const pad = (n) => String(n).padStart(2, "0");
+  const mmyyyy = (d) => `${pad(d.getMonth() + 1)}.${d.getFullYear()}`;
+  function span(days) {
+    days = Math.max(0, Math.round(days));
+    const y = Math.floor(days / 365), m = Math.floor((days % 365) / 30);
+    if (y && m) return `${y} г. ${m} мес.`;
+    if (y) return `${y} г.`;
+    if (m) return `${m} мес.`;
+    return `${days} дн.`;
+  }
+  function setStatus(text, kind) { statusEl.textContent = text; statusEl.className = "status" + (kind ? " " + kind : ""); }
+  function toast(text) { toastEl.textContent = text; clearTimeout(toast.t); toast.t = setTimeout(() => (toastEl.textContent = ""), 5000); }
+
+  // ---------- parsing ----------
+  function parseProfile(raw) {
+    const s = raw.trim().replace(/\/+$/, "");
+    if (!s) return null;
+    let m = s.match(/^(?:https?:\/\/)?(?:www\.)?github\.com\/([A-Za-z0-9-]+)/i);
+    if (m) return { host: "github", user: m[1] };
+    m = s.match(/^(?:https?:\/\/)?([^\/\s]*gitlab[^\/\s]*)\/([^\s?#]+)/i);
+    if (m) return { host: "gitlab", base: "https://" + m[1], user: decodeURIComponent(m[2]).replace(/^-\//, "") };
+    m = s.match(/^(gh|github|gl|gitlab)\s*[:\/]\s*(.+)$/i);
+    if (m) return /^g(l|itlab)$/i.test(m[1]) ? { host: "gitlab", base: "https://gitlab.com", user: m[2] } : { host: "github", user: m[2] };
+    m = s.match(/^@?([A-Za-z0-9][A-Za-z0-9-]*)$/);
+    if (m) return { host: "github", user: m[1] };
+    return null;
+  }
+
+  // ---------- fetching ----------
+  class FriendlyError extends Error {}
+  async function getJSON(url) {
+    let res;
+    try { res = await fetch(url, { headers: { Accept: "application/json" } }); }
+    catch (e) {
+      throw new FriendlyError("Браузер не пустил запрос к API. Если вы смотрите страницу в окне предпросмотра Claude, там внешние запросы закрыты: откройте версию страницы с хостинга. Пока можно посмотреть пример.");
+    }
+    if (res.status === 404) throw new FriendlyError("Такого профиля нет. Проверьте ссылку.");
+    if (res.status === 403 || res.status === 429) throw new FriendlyError("API временно не отвечает: кончился лимит запросов без токена (60 в час для GitHub). Попробуйте через час.");
+    if (!res.ok) throw new FriendlyError(`API ответил ошибкой ${res.status}.`);
+    return res.json();
+  }
+
+  // Finds the gap before the latest burst of activity. dates: newest first.
+  function zombieGap(dates, now) {
+    const recent = dates.filter((d) => now - d <= RECENT_DAYS * DAY);
+    if (!recent.length || recent.length === dates.length) return 0;
+    const oldestRecent = recent[recent.length - 1];
+    const before = dates[recent.length];
+    const gap = (oldestRecent - before) / DAY;
+    return gap >= DEAD_DAYS ? gap : 0;
+  }
+
+  async function loadGitHub(user, onProgress) {
+    const repos = [];
+    for (let page = 1; page <= 3; page++) {
+      const batch = await getJSON(`https://api.github.com/users/${encodeURIComponent(user)}/repos?per_page=100&type=owner&sort=pushed&page=${page}`);
+      repos.push(...batch);
+      if (batch.length < 100) break;
+    }
+    const list = repos.filter((r) => !r.fork).map((r) => ({
+      name: r.name, born: new Date(r.created_at), last: new Date(r.pushed_at || r.updated_at),
+      lang: r.language || "", archived: !!r.archived, full: r.full_name,
+    }));
+    return classify(list, async (r) => {
+      const commits = await getJSON(`https://api.github.com/repos/${r.full}/commits?per_page=20`);
+      return commits.map((c) => new Date(c.commit.committer?.date || c.commit.author?.date));
+    }, onProgress);
+  }
+
+  async function loadGitLab(base, user, onProgress) {
+    const api = base + "/api/v4";
+    const path = encodeURIComponent(user);
+    let projects = [];
+    const users = user.includes("/") ? [] : await getJSON(`${api}/users?username=${path}`);
+    const fetchAll = async (prefix) => {
+      const out = [];
+      for (let page = 1; page <= 3; page++) {
+        const batch = await getJSON(`${prefix}per_page=100&order_by=last_activity_at&page=${page}`);
+        out.push(...batch);
+        if (batch.length < 100) break;
+      }
+      return out;
+    };
+    if (users.length) projects = await fetchAll(`${api}/users/${users[0].id}/projects?`);
+    else projects = await fetchAll(`${api}/groups/${path}/projects?include_subgroups=true&`);
+    const list = projects.filter((p) => !p.forked_from_project).map((p) => ({
+      name: p.path || p.name, born: new Date(p.created_at), last: new Date(p.last_activity_at),
+      lang: "", archived: !!p.archived, id: p.id,
+    }));
+    return classify(list, async (r) => {
+      const commits = await getJSON(`${api}/projects/${r.id}/repository/commits?per_page=20`);
+      return commits.map((c) => new Date(c.committed_date || c.created_at));
+    }, onProgress);
+  }
+
+  async function classify(list, commitDates, onProgress) {
+    const now = Date.now();
+    const graves = [], zombies = [], alive = [];
+    const candidates = list
+      .filter((r) => !r.archived && now - r.last <= RECENT_DAYS * DAY && now - r.born > DEAD_DAYS * DAY)
+      .sort((a, b) => b.last - a.last)
+      .slice(0, MAX_ZOMBIE_CHECKS);
+    let done = 0;
+    for (const r of candidates) {
+      onProgress?.(`Слушаем, не шевелится ли кто под землёй… ${++done}/${candidates.length}`);
+      try {
+        const dates = (await commitDates(r)).filter((d) => !isNaN(d)).sort((a, b) => b - a);
+        const gap = zombieGap(dates, now);
+        if (gap) { r.slept = gap; r.woke = dates[0]; }
+      } catch (e) { if (e instanceof FriendlyError && /лимит/.test(e.message)) break; }
+    }
+    for (const r of list) {
+      if (r.slept) zombies.push(r);
+      else if (r.archived || now - r.last >= DEAD_DAYS * DAY) graves.push(r);
+      else alive.push(r);
+    }
+    graves.sort((a, b) => a.last - b.last);
+    zombies.sort((a, b) => b.slept - a.slept);
+    return { graves, zombies, alive, total: list.length };
+  }
+
+  // ---------- demo ----------
+  function demoData() {
+    const now = Date.now();
+    const ago = (d) => new Date(now - d * DAY);
+    const g = (name, born, last, lang, archived) => ({ name, born: ago(born), last: ago(last), lang, archived: !!archived });
+    const graves = [
+      g("my-first-website", 3900, 3700, "HTML"),
+      g("todo-app-v3", 3100, 2950, "JavaScript"),
+      g("arduino-plant-water", 2800, 2500, "C++"),
+      g("telegram-bot-weather", 2300, 2050, "Python"),
+      g("dotfiles-old", 2600, 1900, "Shell", true),
+      g("startup-landing", 1500, 1420, "Vue"),
+      g("rust-raytracer", 1300, 1100, "Rust"),
+      g("leetcode-solutions", 1600, 760, "Go"),
+      g("blog-engine", 900, 610, "TypeScript"),
+      g("nft-marketplace", 1450, 1380, "Solidity"),
+      g("habit-tracker", 700, 330, "Kotlin"),
+    ].sort((a, b) => a.last - b.last);
+    const zombies = [
+      { name: "game-jam-2019", born: ago(2600), last: ago(6), lang: "C#", slept: 1950, woke: ago(6) },
+      { name: "resume", born: ago(1800), last: ago(20), lang: "TeX", slept: 400, woke: ago(20) },
+    ];
+    const alive = ["climbing-log", "portfolio", "infra"].map((n) => ({ name: n }));
+    return { who: "example-dev", hostLabel: "github.com", hashName: "", graves, zombies, alive, total: graves.length + zombies.length + alive.length, demo: true };
+  }
+
+  // ---------- drawing ----------
+  const C = {
+    stoneHi: "#9b97a8", stoneLo: "#5c586b", stoneEdge: "#2b2737", engrave: "#26222e",
+    skin: "#93ab78", skinDark: "#5d7349", skinLine: "#1d2715", dirt: "#2b201c", dirtHi: "#3e2e27",
+    pumpkin: "#ff7a1a", slime: "#a3d977", bone: "#ece4d2",
+  };
+
+  function drawSky(r) {
+    const sky = ctx.createLinearGradient(0, 0, 0, 520);
+    sky.addColorStop(0, "#07060f"); sky.addColorStop(0.55, "#211836"); sky.addColorStop(1, "#57304a");
+    ctx.fillStyle = sky; ctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < 160; i++) {
+      const x = r() * W, y = r() * 420, s = r() * 1.6 + 0.3;
+      ctx.fillStyle = `rgba(255,248,230,${0.25 + r() * 0.6})`;
+      ctx.fillRect(x, y, s, s);
+    }
+    // moon
+    const mx = 930, my = 175;
+    const glow = ctx.createRadialGradient(mx, my, 60, mx, my, 260);
+    glow.addColorStop(0, "rgba(255,226,170,.35)"); glow.addColorStop(1, "rgba(255,226,170,0)");
+    ctx.fillStyle = glow; ctx.fillRect(mx - 260, my - 260, 520, 520);
+    const moon = ctx.createRadialGradient(mx - 25, my - 25, 10, mx, my, 92);
+    moon.addColorStop(0, "#fff6dc"); moon.addColorStop(1, "#e7cf98");
+    ctx.fillStyle = moon; ctx.beginPath(); ctx.arc(mx, my, 90, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = "rgba(170,140,90,.28)";
+    [[-30, -20, 16], [25, 15, 22], [-10, 40, 11], [40, -35, 9], [-45, 25, 8]].forEach(([dx, dy, rr]) => { ctx.beginPath(); ctx.arc(mx + dx, my + dy, rr, 0, Math.PI * 2); ctx.fill(); });
+    // clouds across the moon
+    ctx.fillStyle = "rgba(20,14,32,.55)";
+    for (let i = 0; i < 4; i++) { ctx.beginPath(); ctx.ellipse(780 + i * 110 + r() * 40, 215 + r() * 40, 110 + r() * 60, 12 + r() * 8, 0, 0, Math.PI * 2); ctx.fill(); }
+    // bats
+    ctx.fillStyle = "#08060c";
+    for (let i = 0; i < 6; i++) bat(700 + r() * 380, 60 + r() * 230, 0.5 + r() * 0.7, r() * 0.6 - 0.3);
+  }
+
+  function bat(x, y, s, rot) {
+    const pts = [[0, -4], [6, -9], [14, -12], [26, -16], [34, -6], [27, -5], [22, 1], [17, -2], [12, 5], [6, 2], [0, 6]];
+    ctx.save(); ctx.translate(x, y); ctx.rotate(rot); ctx.scale(s, s);
+    ctx.beginPath(); ctx.moveTo(0, -4);
+    for (const [px, py] of pts) ctx.lineTo(px, py);
+    for (let i = pts.length - 1; i >= 0; i--) ctx.lineTo(-pts[i][0], pts[i][1]);
+    ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(0, 0, 4, 7, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawHills(r) {
+    const layer = (base, amp, color, step) => {
+      ctx.fillStyle = color; ctx.beginPath(); ctx.moveTo(0, H);
+      let y = base;
+      for (let x = 0; x <= W + step; x += step) { y = base + Math.sin(x / 170 + amp) * amp + (r() - 0.5) * 10; ctx.lineTo(x, y); }
+      ctx.lineTo(W, H); ctx.closePath(); ctx.fill();
+    };
+    layer(420, 22, "#1f1630", 40);
+    // chapel on the far hill
+    ctx.fillStyle = "#170f24";
+    ctx.fillRect(250, 360, 70, 70); ctx.beginPath(); ctx.moveTo(244, 362); ctx.lineTo(285, 322); ctx.lineTo(326, 362); ctx.fill();
+    ctx.fillRect(296, 300, 22, 70); ctx.beginPath(); ctx.moveTo(292, 302); ctx.lineTo(307, 270); ctx.lineTo(322, 302); ctx.fill();
+    ctx.fillRect(305, 250, 4, 22); ctx.fillRect(299, 256, 16, 4);
+    ctx.fillStyle = "rgba(255,170,60,.7)"; ctx.fillRect(272, 380, 10, 16); ctx.fillRect(303, 318, 7, 10);
+    layer(462, 14, "#170f22", 30);
+  }
+
+  function drawTree(r) {
+    ctx.strokeStyle = "#0a0710"; ctx.lineCap = "round";
+    const branch = (x, y, len, ang, w, depth) => {
+      if (depth === 0 || len < 6) return;
+      const x2 = x + Math.cos(ang) * len, y2 = y + Math.sin(ang) * len;
+      ctx.lineWidth = w; ctx.beginPath(); ctx.moveTo(x, y);
+      ctx.quadraticCurveTo(x + Math.cos(ang + 0.3) * len * 0.5, y + Math.sin(ang + 0.3) * len * 0.5, x2, y2); ctx.stroke();
+      const n = depth > 4 ? 2 : 2 + (r() < 0.4 ? 1 : 0);
+      for (let i = 0; i < n; i++) branch(x2, y2, len * (0.62 + r() * 0.18), ang + (r() - 0.5) * 1.3, w * 0.66, depth - 1);
+    };
+    branch(95, 640, 150, -Math.PI / 2 + 0.08, 26, 8);
+    // a noose-less swing of a lantern? just a crow
+    ctx.fillStyle = "#0a0710";
+    ctx.beginPath(); ctx.ellipse(175, 352, 14, 9, -0.2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(187, 344, 6, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(192, 344); ctx.lineTo(201, 347); ctx.lineTo(192, 347); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(162, 354); ctx.lineTo(148, 366); ctx.lineTo(160, 358); ctx.fill();
+  }
+
+  function drawFence(r) {
+    ctx.fillStyle = "#0c0913"; ctx.strokeStyle = "#0c0913";
+    ctx.fillRect(0, 468, W, 4); ctx.fillRect(0, 494, W, 4);
+    for (let x = 8; x < W; x += 24) {
+      if (r() < 0.08) continue;
+      const tilt = (r() - 0.5) * 0.12, top = 446 + r() * 6;
+      ctx.save(); ctx.translate(x, 508); ctx.rotate(tilt);
+      ctx.fillRect(-2, top - 508, 4, 508 - top);
+      ctx.beginPath(); ctx.moveTo(-6, top - 504); ctx.lineTo(0, top - 520); ctx.lineTo(6, top - 504); ctx.fill();
+      ctx.restore();
+    }
+  }
+
+  function drawGround() {
+    const g = ctx.createLinearGradient(0, 480, 0, H);
+    g.addColorStop(0, "#1c1526"); g.addColorStop(1, "#0b0810");
+    ctx.fillStyle = g; ctx.beginPath(); ctx.moveTo(0, 505);
+    for (let x = 0; x <= W; x += 60) ctx.lineTo(x, 500 + Math.sin(x / 90) * 6);
+    ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill();
+  }
+
+  function fog(y, alpha, r) {
+    for (let i = 0; i < 7; i++) {
+      const x = r() * W, rx = 180 + r() * 220;
+      const f = ctx.createRadialGradient(x, y, 0, x, y, rx);
+      f.addColorStop(0, `rgba(200,190,230,${alpha})`); f.addColorStop(1, "rgba(200,190,230,0)");
+      ctx.save(); ctx.translate(x, y); ctx.scale(1, 0.22); ctx.translate(-x, -y);
+      ctx.fillStyle = f; ctx.fillRect(x - rx, y - rx, rx * 2, rx * 2); ctx.restore();
+    }
+  }
+
+  function grass(x, y, s, r, color) {
+    ctx.strokeStyle = color; ctx.lineWidth = 1.4 * s;
+    for (let i = 0; i < 9; i++) {
+      const gx = x + (r() - 0.5) * 30 * s, h = (6 + r() * 12) * s;
+      ctx.beginPath(); ctx.moveTo(gx, y); ctx.quadraticCurveTo(gx + (r() - 0.5) * 6 * s, y - h * 0.6, gx + (r() - 0.5) * 8 * s, y - h); ctx.stroke();
+    }
+  }
+
+  function stonePath(type, w, h) {
+    ctx.beginPath();
+    if (type === 0) { // arch
+      ctx.moveTo(-w / 2, 0); ctx.lineTo(-w / 2, -h + w / 2); ctx.arc(0, -h + w / 2, w / 2, Math.PI, 0); ctx.lineTo(w / 2, 0);
+    } else if (type === 1) { // gothic
+      ctx.moveTo(-w / 2, 0); ctx.lineTo(-w / 2, -h * 0.68); ctx.quadraticCurveTo(-w / 2, -h * 0.9, 0, -h); ctx.quadraticCurveTo(w / 2, -h * 0.9, w / 2, -h * 0.68); ctx.lineTo(w / 2, 0);
+    } else { // slab with cross
+      const sh = h * 0.74, cw = w * 0.16;
+      ctx.moveTo(-w / 2, 0); ctx.lineTo(-w / 2, -sh + 8); ctx.quadraticCurveTo(-w / 2, -sh, -w / 2 + 8, -sh);
+      ctx.lineTo(-cw / 2, -sh); ctx.lineTo(-cw / 2, -h * 0.86); ctx.lineTo(-w * 0.3, -h * 0.86); ctx.lineTo(-w * 0.3, -h * 0.86 - cw); ctx.lineTo(-cw / 2, -h * 0.86 - cw);
+      ctx.lineTo(-cw / 2, -h); ctx.lineTo(cw / 2, -h); ctx.lineTo(cw / 2, -h * 0.86 - cw); ctx.lineTo(w * 0.3, -h * 0.86 - cw); ctx.lineTo(w * 0.3, -h * 0.86); ctx.lineTo(cw / 2, -h * 0.86);
+      ctx.lineTo(cw / 2, -sh); ctx.lineTo(w / 2 - 8, -sh); ctx.quadraticCurveTo(w / 2, -sh, w / 2, -sh + 8); ctx.lineTo(w / 2, 0);
+    }
+    ctx.closePath();
+  }
+
+  function engrave(text, x, y, font) {
+    ctx.font = font;
+    ctx.fillStyle = "rgba(255,255,255,.22)"; ctx.fillText(text, x + 0.8, y + 1);
+    ctx.fillStyle = C.engrave; ctx.fillText(text, x, y);
+  }
+
+  function fitName(name, maxW, maxPx, minPx) {
+    for (let px = maxPx; px >= minPx; px -= 1) {
+      ctx.font = `700 ${px}px ${STONE_FONT}`;
+      if (ctx.measureText(name).width <= maxW) return { lines: [name], px };
+    }
+    // split in two lines, at the separator closest to the middle
+    const mid = name.length / 2;
+    const seps = [...name.matchAll(/[-_.]/g)].map((m) => m.index + 1).filter((i) => i > 2 && i < name.length - 2);
+    const at = seps.length ? seps.reduce((a, b) => (Math.abs(b - mid) < Math.abs(a - mid) ? b : a)) : Math.ceil(mid);
+    const lines = [name.slice(0, at), name.slice(at)];
+    let px = maxPx;
+    for (; px > minPx; px--) { ctx.font = `700 ${px}px ${STONE_FONT}`; if (Math.max(...lines.map((l) => ctx.measureText(l).width)) <= maxW) break; }
+    ctx.font = `700 ${px}px ${STONE_FONT}`;
+    return { lines: lines.map((l) => { let t = l; while (ctx.measureText(t).width > maxW && t.length > 3) t = t.slice(0, -2) + "…"; return t; }), px };
+  }
+
+  function drawStone(x, y, s, item, r) {
+    const w = 150 * s, h = 196 * s, type = Math.floor(r() * 3), tilt = (r() - 0.5) * 0.09;
+    ctx.save(); ctx.translate(x, y);
+    // mound
+    ctx.fillStyle = C.dirt; ctx.beginPath(); ctx.ellipse(0, 6 * s, w * 0.62, 18 * s, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = C.dirtHi; ctx.beginPath(); ctx.ellipse(0, 2 * s, w * 0.5, 9 * s, 0, Math.PI, 0); ctx.fill();
+    ctx.rotate(tilt);
+    // shadow
+    ctx.save(); ctx.translate(7 * s, -3 * s); stonePath(type, w, h); ctx.fillStyle = "rgba(0,0,0,.45)"; ctx.fill(); ctx.restore();
+    stonePath(type, w, h);
+    const g = ctx.createLinearGradient(-w / 2, -h, w / 2, 0);
+    g.addColorStop(0, C.stoneHi); g.addColorStop(1, C.stoneLo);
+    ctx.fillStyle = g; ctx.fill();
+    ctx.lineWidth = 2.5 * s; ctx.strokeStyle = C.stoneEdge; ctx.stroke();
+    ctx.save(); stonePath(type, w, h); ctx.clip();
+    for (let i = 0; i < 70; i++) { ctx.fillStyle = r() < 0.5 ? "rgba(0,0,0,.12)" : "rgba(255,255,255,.08)"; ctx.fillRect((r() - 0.5) * w, -r() * h, 2 * s, 2 * s); }
+    // moss
+    ctx.fillStyle = "rgba(96,130,70,.55)";
+    for (let i = 0; i < 6; i++) { ctx.beginPath(); ctx.arc((r() - 0.5) * w, -r() * 18 * s, (5 + r() * 9) * s, 0, Math.PI * 2); ctx.fill(); }
+    // crack
+    if (r() < 0.6) {
+      ctx.strokeStyle = "rgba(30,26,38,.7)"; ctx.lineWidth = 1.3 * s; ctx.beginPath();
+      let cx = (r() - 0.5) * w * 0.6, cy = -h * (0.55 + r() * 0.3); ctx.moveTo(cx, cy);
+      for (let i = 0; i < 5; i++) { cx += (r() - 0.5) * 16 * s; cy += 10 * s; ctx.lineTo(cx, cy); }
+      ctx.stroke();
+    }
+    ctx.restore();
+    // text
+    ctx.textAlign = "center"; ctx.textBaseline = "alphabetic";
+    let ty = type === 2 ? -h * 0.6 : -h * 0.7;
+    engrave("R.I.P.", 0, ty, `700 ${Math.round(16 * s)}px ${STONE_FONT}`);
+    ty += 26 * s;
+    if (item.empty) {
+      engrave("здесь пока", 0, ty, `700 ${Math.round(17 * s)}px ${STONE_FONT}`);
+      engrave("никого", 0, ty + 22 * s, `700 ${Math.round(17 * s)}px ${STONE_FONT}`);
+    } else {
+      const fit = fitName(item.name, w * 0.82, Math.round(22 * s), Math.round(10 * s));
+      fit.lines.forEach((l, i) => engrave(l, 0, ty + i * fit.px * 1.05, `700 ${fit.px}px ${STONE_FONT}`));
+      ty += (fit.lines.length - 1) * fit.px * 1.05 + 22 * s;
+      engrave(`${mmyyyy(item.born)} – ${mmyyyy(item.last)}`, 0, ty, `500 ${Math.round(14 * s)}px ${STONE_FONT}`);
+      const note = item.archived ? "в архиве" : item.lang;
+      if (note) engrave(note.toLowerCase(), 0, ty + 18 * s, `500 ${Math.round(12.5 * s)}px ${STONE_FONT}`);
+    }
+    ctx.restore();
+    grass(x, y + 4 * s, s, r, "#2f3f27");
+  }
+
+  function finger(len, w, curl) {
+    ctx.beginPath(); ctx.roundRect(-w / 2, -len * 0.55, w, len * 0.55 + w / 2, w / 2); ctx.fill(); ctx.stroke();
+    ctx.save(); ctx.translate(0, -len * 0.5); ctx.rotate(curl);
+    ctx.beginPath(); ctx.roundRect(-w * 0.45, -len * 0.5, w * 0.9, len * 0.5 + w / 2, w * 0.45); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = "#3a3a2a"; ctx.beginPath(); ctx.ellipse(0, -len * 0.42, w * 0.28, w * 0.36, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+
+  function drawHand(x, y, s, item, r) {
+    ctx.save(); ctx.translate(x, y);
+    const glow = ctx.createRadialGradient(0, -80 * s, 0, 0, -80 * s, 150 * s);
+    glow.addColorStop(0, "rgba(163,217,119,.28)"); glow.addColorStop(1, "rgba(163,217,119,0)");
+    ctx.fillStyle = glow; ctx.fillRect(-150 * s, -230 * s, 300 * s, 260 * s);
+    ctx.fillStyle = C.dirt; ctx.beginPath(); ctx.ellipse(0, 4 * s, 80 * s, 20 * s, 0, 0, Math.PI * 2); ctx.fill();
+
+    ctx.save(); ctx.rotate((r() - 0.5) * 0.3);
+    const aw = 30 * s, ah = 112 * s;
+    const sk = ctx.createLinearGradient(-aw, 0, aw, 0);
+    sk.addColorStop(0, C.skinDark); sk.addColorStop(0.5, C.skin); sk.addColorStop(1, C.skinDark);
+    ctx.fillStyle = sk; ctx.strokeStyle = C.skinLine; ctx.lineWidth = 2.2 * s;
+    ctx.beginPath(); ctx.moveTo(-aw / 2 - 3 * s, 4 * s); ctx.quadraticCurveTo(-aw / 2 - 5 * s, -ah * 0.5, -aw * 0.42, -ah);
+    ctx.lineTo(aw * 0.42, -ah); ctx.quadraticCurveTo(aw / 2 + 4 * s, -ah * 0.5, aw / 2 + 3 * s, 4 * s); ctx.closePath(); ctx.fill(); ctx.stroke();
+    // stitches
+    ctx.strokeStyle = "#2a2a1e"; ctx.lineWidth = 1.4 * s; ctx.beginPath(); ctx.moveTo(-8 * s, -ah * 0.55); ctx.lineTo(9 * s, -ah * 0.62); ctx.stroke();
+    for (let i = 0; i < 4; i++) { const t = i / 3, sx = -8 * s + 17 * s * t, sy = -ah * 0.55 - 0.07 * ah * t; ctx.beginPath(); ctx.moveTo(sx - 1 * s, sy - 4 * s); ctx.lineTo(sx + 1 * s, sy + 4 * s); ctx.stroke(); }
+    // palm
+    ctx.save(); ctx.translate(0, -ah - 14 * s);
+    ctx.fillStyle = C.skin; ctx.strokeStyle = C.skinLine; ctx.lineWidth = 2.2 * s;
+    const fl = [34, 42, 40, 32].map((v) => v * s), fa = [-0.42, -0.14, 0.12, 0.38], fc = [-0.35, -0.15, 0.2, 0.45];
+    fa.forEach((a, i) => { ctx.save(); ctx.translate((i - 1.5) * 9.5 * s, -10 * s); ctx.rotate(a); ctx.fillStyle = C.skin; finger(fl[i], 10 * s, fc[i] * (0.7 + r() * 0.6)); ctx.restore(); });
+    ctx.save(); ctx.translate(-17 * s, 10 * s); ctx.rotate(-1.05); ctx.fillStyle = C.skin; finger(28 * s, 11 * s, 0.4); ctx.restore();
+    ctx.fillStyle = C.skin; ctx.beginPath(); ctx.ellipse(0, 6 * s, 20 * s, 26 * s, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = "rgba(29,39,21,.55)"; ctx.lineWidth = 1.2 * s;
+    for (let i = 0; i < 4; i++) { const kx = (i - 1.5) * 9.5 * s; ctx.beginPath(); ctx.moveTo(kx - 3 * s, -12 * s); ctx.lineTo(kx + 3 * s, -13 * s); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(-6 * s, 18 * s); ctx.lineTo(4 * s, 26 * s); ctx.stroke();
+    ctx.restore();
+    // torn sleeve
+    ctx.fillStyle = "#3b2d4c"; ctx.strokeStyle = "#1a1224"; ctx.lineWidth = 1.5 * s;
+    ctx.beginPath(); ctx.moveTo(-aw / 2 - 7 * s, 6 * s); ctx.lineTo(-aw / 2 - 6 * s, -34 * s);
+    const teeth = 6;
+    for (let i = 0; i <= teeth; i++) { const tx = -aw / 2 - 6 * s + ((aw + 12 * s) * i) / teeth; ctx.lineTo(tx, (i % 2 ? -46 : -34) * s - r() * 6 * s); }
+    ctx.lineTo(aw / 2 + 7 * s, 6 * s); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.restore();
+
+    // dirt clods over the base
+    ctx.fillStyle = C.dirtHi;
+    ctx.beginPath(); ctx.ellipse(0, 6 * s, 54 * s, 12 * s, 0, Math.PI, 0); ctx.fill();
+    for (let i = 0; i < 9; i++) { ctx.fillStyle = r() < 0.5 ? C.dirt : C.dirtHi; ctx.beginPath(); ctx.arc((r() - 0.5) * 120 * s, (r() * 10 - 2) * s, (3 + r() * 6) * s, 0, Math.PI * 2); ctx.fill(); }
+
+    // wooden sign
+    const sx = 92 * s, pw = 136 * s, ph = 58 * s;
+    ctx.fillStyle = "#4a3220"; ctx.fillRect(sx - 4 * s, -70 * s, 8 * s, 78 * s);
+    ctx.save(); ctx.translate(sx, -86 * s); ctx.rotate(0.06);
+    ctx.fillStyle = "#7a5634"; ctx.strokeStyle = "#2c1d10"; ctx.lineWidth = 2 * s;
+    ctx.beginPath(); ctx.roundRect(-pw / 2, -ph / 2, pw, ph, 4 * s); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = "rgba(44,29,16,.35)"; ctx.beginPath(); ctx.moveTo(-pw / 2 + 6 * s, -4 * s); ctx.lineTo(pw / 2 - 6 * s, -6 * s); ctx.stroke();
+    ctx.textAlign = "center"; ctx.fillStyle = "#1b120a";
+    const fit = fitName(item.name, pw * 0.88, Math.round(17 * s), Math.round(9 * s));
+    ctx.font = `700 ${fit.px}px ${STONE_FONT}`; ctx.fillText(fit.lines.join(""), 0, -6 * s);
+    ctx.font = `500 ${Math.round(13 * s)}px ${BODY_FONT}`; ctx.fillStyle = "#24170c";
+    ctx.fillText(`восстал после ${span(item.slept)}`, 0, 15 * s);
+    ctx.restore();
+    ctx.restore();
+    grass(x - 40 * s, y + 6 * s, s, r, "#2f3f27");
+  }
+
+  function pumpkin(x, y, s) {
+    ctx.save(); ctx.translate(x, y);
+    const glow = ctx.createRadialGradient(0, -20 * s, 0, 0, -20 * s, 90 * s);
+    glow.addColorStop(0, "rgba(255,150,40,.35)"); glow.addColorStop(1, "rgba(255,150,40,0)");
+    ctx.fillStyle = glow; ctx.fillRect(-90 * s, -110 * s, 180 * s, 180 * s);
+    ctx.fillStyle = "#3d5a26"; ctx.fillRect(-3 * s, -70 * s, 7 * s, 16 * s);
+    [[-22, 30], [22, 30], [-10, 34], [10, 34], [0, 36]].forEach(([dx, rx]) => {
+      ctx.fillStyle = Math.abs(dx) > 15 ? "#c9520c" : "#e8650f";
+      ctx.beginPath(); ctx.ellipse(dx * s, -28 * s, rx * s, 32 * s, 0, 0, Math.PI * 2); ctx.fill();
+    });
+    ctx.fillStyle = "#ffd257";
+    ctx.beginPath(); ctx.moveTo(-22 * s, -38 * s); ctx.lineTo(-10 * s, -38 * s); ctx.lineTo(-16 * s, -50 * s); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(22 * s, -38 * s); ctx.lineTo(10 * s, -38 * s); ctx.lineTo(16 * s, -50 * s); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-24 * s, -22 * s); ctx.lineTo(-14 * s, -14 * s); ctx.lineTo(-6 * s, -20 * s); ctx.lineTo(2 * s, -12 * s); ctx.lineTo(10 * s, -20 * s); ctx.lineTo(16 * s, -14 * s); ctx.lineTo(24 * s, -22 * s); ctx.quadraticCurveTo(0, -2 * s, -24 * s, -22 * s); ctx.fill();
+    ctx.restore();
+  }
+
+  const STONE_FONT = '"Cormorant SC", Georgia, serif';
+  const BODY_FONT = '"Alegreya Sans", system-ui, sans-serif';
+  const DISPLAY_FONT = '"Rubik Wet Paint", "Alegreya Sans", sans-serif';
+  const ROWS = [
+    { y: 590, s: 0.6, max: 6 },
+    { y: 712, s: 0.78, max: 5 },
+    { y: 862, s: 1.0, max: 4 },
+  ];
+  const CAP = ROWS.reduce((a, b) => a + b.max, 0);
+
+  function layout(items, r) {
+    // front row first, zombies get the best seats
+    const rows = [[], [], []];
+    let rest = items.slice(0, CAP);
+    for (let ri = 2; ri >= 0 && rest.length; ri--) {
+      const take = rest.slice(0, ROWS[ri].max);
+      rest = rest.slice(ROWS[ri].max);
+      rows[ri] = take;
+    }
+    const placed = [];
+    rows.forEach((row, ri) => {
+      if (!row.length) return;
+      const shuffled = row.map((it) => [r(), it]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+      const { y, s } = ROWS[ri];
+      const left = 120, right = W - 120, n = shuffled.length;
+      const step = n === 1 ? 0 : (right - left) / (n - 1);
+      shuffled.forEach((it, i) => {
+        let x = n === 1 ? W / 2 : left + step * i;
+        if (n > 1 && n < ROWS[ri].max) x = W / 2 + (x - W / 2) * (0.45 + 0.55 * (n - 1) / (ROWS[ri].max - 1));
+        x += (ri % 2 ? 40 : -10) * s + (r() - 0.5) * 30 * s;
+        placed.push({ it, x, y: y + (r() - 0.5) * 10 * s, s });
+      });
+    });
+    return placed;
+  }
+
+  function drawScene(data) {
+    const r = rngFrom(hashStr(data.who + data.hostLabel));
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, W, H);
+    drawSky(r); drawHills(r); drawTree(r); drawFence(r); drawGround();
+    fog(520, 0.12, r);
+
+    const items = [
+      ...data.zombies.map((z) => ({ ...z, kind: "zombie" })),
+      ...data.graves.map((g) => ({ ...g, kind: "grave" })),
+    ];
+    if (!items.length) items.push({ kind: "grave", empty: true });
+    const placed = layout(items, r);
+    for (let ri = 0; ri < 3; ri++) {
+      placed.filter((p) => p.s === ROWS[ri].s).forEach((p) => p.it.kind === "zombie" ? drawHand(p.x, p.y, p.s * 1.3, p.it, r) : drawStone(p.x, p.y, p.s, p.it, r));
+      if (ri === 0) fog(640, 0.09, r);
+      if (ri === 1) fog(780, 0.07, r);
+    }
+    pumpkin(70, 930, 0.95); pumpkin(1135, 922, 0.75);
+
+    // title
+    ctx.textAlign = "left"; ctx.textBaseline = "alphabetic";
+    ctx.shadowColor = "rgba(255,122,26,.6)"; ctx.shadowBlur = 18;
+    ctx.fillStyle = C.pumpkin; ctx.font = `64px ${DISPLAY_FONT}`;
+    ctx.fillText("Кладбище проектов", 48, 92);
+    ctx.shadowBlur = 0;
+    ctx.fillStyle = C.bone; ctx.font = `500 28px ${BODY_FONT}`;
+    ctx.fillText(`${data.who} · ${data.hostLabel}${data.demo ? " · пример" : ""}`, 50, 132);
+
+    // footer
+    const fg = ctx.createLinearGradient(0, H - 90, 0, H);
+    fg.addColorStop(0, "rgba(8,6,12,0)"); fg.addColorStop(1, "rgba(8,6,12,.9)");
+    ctx.fillStyle = fg; ctx.fillRect(0, H - 90, W, 90);
+    const extra = Math.max(0, items.length - CAP);
+    const parts = [`Похоронено: ${data.graves.length}`, `Восстали: ${data.zombies.length}`, `Ещё дышат: ${data.alive.length}`];
+    if (extra) parts.push(`не влезли: ${extra}`);
+    ctx.font = `700 24px ${BODY_FONT}`; ctx.textAlign = "center"; ctx.fillStyle = C.bone;
+    ctx.fillText(parts.join("   ·   "), W / 2, H - 22);
+    canvas.classList.remove("fresh"); void canvas.offsetWidth; canvas.classList.add("fresh");
+  }
+
+  // ---------- page ----------
+  function renderList(data) {
+    const ul = $("list"); ul.textContent = "";
+    $("listTitle").textContent = data.demo ? "Покойные (пример)" : `Покойные: ${data.graves.length}`;
+    const add = (name, right, cls) => {
+      const li = document.createElement("li");
+      const a = document.createElement("span"); a.textContent = name; if (cls) a.className = cls;
+      const b = document.createElement("span"); b.className = "d"; b.textContent = right;
+      li.append(a, b); ul.append(li);
+    };
+    data.zombies.forEach((z) => add("✋ " + z.name, `спал ${span(z.slept)}`, "z"));
+    data.graves.forEach((g) => add(g.name, `${mmyyyy(g.born)} – ${mmyyyy(g.last)}`));
+    if (!data.zombies.length && !data.graves.length) add("Никто не умер. Подозрительно.", "");
+  }
+
+  function show(data) {
+    current = data;
+    drawScene(data);
+    renderList(data);
+    canvas.setAttribute("aria-label", `Кладбище проектов ${data.who}: похоронено ${data.graves.length}, восстали ${data.zombies.length}, живы ${data.alive.length}`);
+  }
+
+  async function run(raw) {
+    const p = parseProfile(raw);
+    if (!p) { setStatus("Не узнаю ссылку. Нужна ссылка вида https://github.com/имя или https://gitlab.com/имя.", "err"); return; }
+    $("go").disabled = true;
+    setStatus("Копаем…");
+    try {
+      const res = p.host === "github" ? await loadGitHub(p.user, (t) => setStatus(t)) : await loadGitLab(p.base, p.user, (t) => setStatus(t));
+      const hostLabel = p.host === "github" ? "github.com" : p.base.replace(/^https:\/\//, "");
+      const hashName = /^[A-Za-z0-9-]+$/.test(p.user) && (p.host === "github" || hostLabel === "gitlab.com") ? `${p.host}-${p.user}` : "";
+      show({ who: p.user, hostLabel, hashName, ...res, demo: false });
+      if (hashName) { try { history.replaceState(null, "", "#" + hashName); } catch (e) {} }
+      setStatus(res.total ? `Готово: ${res.total} проектов, из них ${res.graves.length} на кладбище и ${res.zombies.length} восставших.` : "У этого профиля нет своих публичных проектов.", "ok");
+    } catch (e) {
+      setStatus(e instanceof FriendlyError ? e.message : "Что-то пошло не так: " + e.message, "err");
+    } finally { $("go").disabled = false; }
+  }
+
+  function toBlob() { return new Promise((res) => canvas.toBlob(res, "image/png")); }
+  const fileName = () => `graveyard-${(current?.who || "projects").replace(/[^A-Za-z0-9-]/g, "_")}.png`;
+  function shareLink() {
+    const base = location.href.split("#")[0];
+    return current?.hashName ? `${base}#${current.hashName}` : base;
+  }
+  const shareText = () => current ? `Моё кладбище проектов: ${current.graves.length} надгробий и ${current.zombies.length} восставших 🎃` : "Кладбище проектов 🎃";
+
+  async function saveImage() {
+    const blob = await toBlob();
+    const dl = window.claude?.use ? await window.claude.use("downloads").catch(() => null) : null;
+    if (dl) {
+      try { await dl.save({ filename: fileName(), data: blob }); toast("Картинка сохранена."); }
+      catch (e) { if (e?.code !== "declined") toast("Сохранить не получилось. Можно сделать скриншот."); }
+      return;
+    }
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a"); a.href = url; a.download = fileName(); document.body.append(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    toast("Картинка сохранена.");
+  }
+
+  async function copy(text) {
+    try { await navigator.clipboard.writeText(text); return true; } catch (e) { return false; }
+  }
+
+  async function share() {
+    try {
+      const blob = await toBlob();
+      const file = new File([blob], fileName(), { type: "image/png" });
+      if (navigator.canShare && navigator.canShare({ files: [file] })) {
+        await navigator.share({ files: [file], title: "Кладбище проектов", text: shareText() + " " + shareLink() });
+        return;
+      }
+      if (navigator.share) { await navigator.share({ title: "Кладбище проектов", text: shareText(), url: shareLink() }); return; }
+    } catch (e) { if (e?.name === "AbortError") return; }
+    const ok = await copy(shareText() + " " + shareLink());
+    toast(ok ? "Текст и ссылка скопированы: вставьте их в пост, а картинку прикрепите через «Сохранить картинку»." : "Поделиться отсюда не получилось. Сохраните картинку и прикрепите её к посту.");
+  }
+
+  $("form").addEventListener("submit", (e) => { e.preventDefault(); run($("profile").value); });
+  document.querySelectorAll("[data-q]").forEach((b) => b.addEventListener("click", () => { $("profile").value = b.dataset.q; run(b.dataset.q); }));
+  $("demoBtn").addEventListener("click", () => { show(demoData()); setStatus("Это пример с выдуманными проектами.", ""); });
+  $("saveBtn").addEventListener("click", saveImage);
+  $("shareBtn").addEventListener("click", share);
+  $("linkBtn").addEventListener("click", async () => {
+    const link = shareLink();
+    toast((await copy(link)) ? "Ссылка скопирована." : "Скопируйте ссылку: " + link);
+  });
+
+  async function boot() {
+    try {
+      await Promise.race([
+        Promise.all([`64px ${DISPLAY_FONT}`, `700 20px ${STONE_FONT}`, `500 20px ${STONE_FONT}`, `500 20px ${BODY_FONT}`, `700 20px ${BODY_FONT}`].map((f) => document.fonts.load(f, "Кладбище RIP"))),
+        new Promise((res) => setTimeout(res, 2500)),
+      ]);
+    } catch (e) {}
+    show(demoData());
+    setStatus("Сейчас на картинке пример. Вставьте свой профиль и нажмите «Смотреть».");
+    const h = location.hash.slice(1).match(/^(github|gitlab)-([A-Za-z0-9-]+)$/);
+    if (h) {
+      const q = h[1] === "github" ? `https://github.com/${h[2]}` : `https://gitlab.com/${h[2]}`;
+      $("profile").value = q; run(q);
+    }
+  }
+  window.addEventListener("hashchange", () => {
+    const h = location.hash.slice(1).match(/^(github|gitlab)-([A-Za-z0-9-]+)$/);
+    if (h && h[0] !== current?.hashName) { const q = `https://${h[1]}.com/${h[2]}`; $("profile").value = q; run(q); }
+  });
+  boot();
+})();
+</script>
+
+</body>
+</html>

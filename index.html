@@ -41,92 +41,79 @@ body {
   overflow-x: hidden;
 }
 
-/* ---------- hero ---------- */
+/* ---------- hero: the whole first screen is the living graveyard ---------- */
 .hero {
   position: relative;
   overflow: hidden;
   isolation: isolate;
-  background:
-    radial-gradient(ellipse 60% 45% at 50% 108%, rgba(255, 122, 26, .22), transparent 70%),
-    linear-gradient(180deg, #05050d 0%, #150e2c 55%, #2a1638 100%);
-  padding-block: 56px 190px;
+  min-height: 100vh;
+  min-height: 100svh;
+  background: #0b0913;
+  display: grid;
+  align-content: start;
+  padding-block: clamp(20px, 6vh, 72px) 96px;
   padding-left: max(16px, env(safe-area-inset-left, 0px));
   padding-right: max(16px, env(safe-area-inset-right, 0px));
 }
+.hero > canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 55%;
+  z-index: 0;
+  display: block;
+}
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(5, 4, 10, .72) 0%, rgba(5, 4, 10, .2) 42%, transparent 62%);
+}
+.lantern {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: radial-gradient(circle 260px at var(--mx, 50%) var(--my, 45%), rgba(255, 190, 110, .1), transparent 60%, rgba(3, 2, 8, .28) 100%);
+}
 .hero-in {
   position: relative;
-  z-index: 3;
-  max-width: 1040px;
+  z-index: 2;
+  width: min(620px, 100%);
   margin: 0 auto;
   display: grid;
-  gap: 18px;
+  gap: 16px;
+  justify-items: center;
+  text-align: center;
 }
-.stars, .moon, .fog, .bat, .ground, .lantern { position: absolute; pointer-events: none; }
-.stars {
-  inset: 0;
-  z-index: 0;
-  background-image:
-    radial-gradient(1.2px 1.2px at 12% 18%, #fff8e0, transparent),
-    radial-gradient(1px 1px at 27% 8%, #fff8e0, transparent),
-    radial-gradient(1.4px 1.4px at 44% 22%, #fff8e0, transparent),
-    radial-gradient(1px 1px at 63% 12%, #fff8e0, transparent),
-    radial-gradient(1.3px 1.3px at 81% 30%, #fff8e0, transparent),
-    radial-gradient(1px 1px at 92% 9%, #fff8e0, transparent),
-    radial-gradient(1px 1px at 6% 40%, #fff8e0, transparent),
-    radial-gradient(1.2px 1.2px at 55% 38%, #fff8e0, transparent),
-    radial-gradient(1px 1px at 35% 45%, #fff8e0, transparent),
-    radial-gradient(1.1px 1.1px at 72% 48%, #fff8e0, transparent);
-  opacity: .8;
-}
-.moon {
-  z-index: 0;
-  width: clamp(130px, 22vw, 230px);
-  aspect-ratio: 1;
-  max-width: 100%;
-  right: 8%;
-  top: 40px;
+.info-btn {
+  position: absolute;
+  z-index: 3;
+  right: max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  width: 54px;
+  height: 54px;
+  padding: 0;
   border-radius: 50%;
-  background:
-    radial-gradient(circle at 34% 36%, rgba(170, 140, 90, .25) 0 9%, transparent 10%),
-    radial-gradient(circle at 62% 58%, rgba(170, 140, 90, .22) 0 13%, transparent 14%),
-    radial-gradient(circle at 44% 72%, rgba(170, 140, 90, .2) 0 6%, transparent 7%),
-    radial-gradient(circle at 38% 34%, #fff7de, #ecd39b 70%);
-  box-shadow: 0 0 60px 20px rgba(255, 220, 160, .22), 0 0 180px 60px rgba(255, 170, 90, .12);
-}
-.fog {
-  z-index: 2;
-  left: -50%;
-  width: 200%;
-  height: 120px;
-  background:
-    radial-gradient(ellipse 18% 50% at 10% 50%, rgba(190, 220, 205, .16), transparent 70%),
-    radial-gradient(ellipse 14% 45% at 32% 60%, rgba(190, 220, 205, .13), transparent 70%),
-    radial-gradient(ellipse 20% 50% at 58% 45%, rgba(190, 220, 205, .15), transparent 70%),
-    radial-gradient(ellipse 16% 45% at 82% 55%, rgba(190, 220, 205, .12), transparent 70%);
-}
-.fog.f1 { bottom: 60px; }
-.fog.f2 { bottom: 10px; opacity: .8; transform: scaleX(-1); }
-.bat { z-index: 1; width: 46px; color: #07060b; top: 0; left: 0; }
-.bat svg { width: 100%; height: auto; display: block; }
-.ground { z-index: 2; left: 0; right: 0; bottom: -1px; height: 170px; color: #08060d; }
-.ground svg { width: 100%; height: 100%; display: block; }
-.lantern {
-  inset: 0;
-  z-index: 2;
-  background: radial-gradient(circle 240px at var(--mx, 72%) var(--my, 32%), rgba(255, 190, 110, .09), transparent 60%, rgba(3, 2, 8, .35) 100%);
-}
-
-.kicker {
-  margin: 0;
-  font-size: 13px;
-  letter-spacing: .22em;
-  text-transform: uppercase;
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: 30px;
+  line-height: 1;
   color: var(--pumpkin);
+  background: rgba(12, 9, 20, .78);
+  border: 1px solid var(--pumpkin);
+  box-shadow: 0 0 18px rgba(255, 122, 26, .4);
 }
+.info-btn:hover { box-shadow: 0 0 28px rgba(255, 122, 26, .7); border-color: var(--pumpkin); }
+
 h1 {
   font-family: var(--f-display);
   font-weight: 400;
-  font-size: clamp(52px, 11vw, 124px);
+  font-size: clamp(46px, 9vw, 100px);
   line-height: .92;
   margin: 0;
   color: var(--pumpkin);
@@ -134,12 +121,11 @@ h1 {
   text-wrap: balance;
 }
 h1 span { color: var(--slime); text-shadow: 0 0 26px rgba(168, 224, 122, .45), 0 4px 0 #17300a; }
-.lede { margin: 0; color: var(--muted); max-width: 54ch; font-size: 19px; }
 
 /* the slab */
 .slab {
-  margin-top: 10px;
-  max-width: 640px;
+  width: 100%;
+  box-sizing: border-box;
   position: relative;
   display: grid;
   gap: 12px;
@@ -214,7 +200,8 @@ button.dig {
 button.dig:hover { box-shadow: 0 0 34px rgba(255, 122, 26, .7); }
 .examples { display: flex; flex-wrap: wrap; gap: 8px; font-size: 14px; color: var(--muted); align-items: center; }
 .examples button { padding: 5px 12px; font-weight: 500; font-size: 14px; border-radius: 999px; background: rgba(26, 20, 40, .7); }
-.status { min-height: 1.5em; margin: 0; color: var(--muted); font-size: 16px; }
+.status { margin: 0; color: var(--bone); font-size: 16px; background: rgba(8, 6, 14, .78); border-radius: 12px; padding: 6px 14px; max-width: 100%; }
+.status:empty { display: none; }
 .status.err { color: var(--blood); }
 .status.busy::after { content: ""; display: inline-block; width: 1.2em; text-align: left; animation: dots 1.2s steps(4) infinite; }
 @keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
@@ -242,7 +229,7 @@ button.dig:hover { box-shadow: 0 0 34px rgba(255, 122, 26, .7); }
   background: linear-gradient(140deg, #3b2b19, #1c140c 40%, #3b2b19);
   box-shadow: 0 0 0 1px #000, 0 20px 60px rgba(0, 0, 0, .6), 0 0 80px rgba(255, 122, 26, .12);
 }
-canvas {
+.frame canvas {
   width: 100%;
   max-width: 100%;
   height: auto;
@@ -264,72 +251,38 @@ ul.graves .z { color: var(--slime); }
 .rules { margin: 0; padding-left: 1.1em; color: var(--muted); display: grid; gap: 6px; }
 .rules b { color: var(--bone); font-weight: 500; }
 
+/* about popup */
+dialog.about {
+  width: min(560px, calc(100% - 32px));
+  box-sizing: border-box;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--panel);
+  color: var(--bone);
+  padding: 28px 24px 22px;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .7), 0 0 60px rgba(255, 122, 26, .12);
+}
+dialog.about::backdrop { background: rgba(5, 4, 10, .72); backdrop-filter: blur(3px); }
+dialog.about h2 { font-family: var(--f-display); font-weight: 400; color: var(--pumpkin); margin: 0 0 10px; font-size: 34px; line-height: 1.1; }
+dialog.about p { margin: 0 0 14px; color: var(--muted); }
+dialog.about .rules { margin-bottom: 18px; }
+dialog.about .close { position: absolute; top: 12px; right: 12px; width: 40px; height: 40px; padding: 0; border-radius: 50%; font-size: 22px; line-height: 1; }
+
 @media (prefers-reduced-motion: no-preference) {
-  .moon { animation: moonGlow 6s ease-in-out infinite alternate; }
-  @keyframes moonGlow { to { box-shadow: 0 0 80px 28px rgba(255, 220, 160, .3), 0 0 220px 80px rgba(255, 170, 90, .16); } }
-  .fog.f1 { animation: drift 38s linear infinite; }
-  .fog.f2 { animation: drift2 52s linear infinite; }
-  @keyframes drift { from { transform: translateX(0); } to { transform: translateX(25%); } }
-  @keyframes drift2 { from { transform: scaleX(-1) translateX(0); } to { transform: scaleX(-1) translateX(25%); } }
-  .bat { animation: fly var(--dur, 14s) linear infinite; animation-delay: var(--delay, 0s); }
-  .bat svg { animation: flap .22s ease-in-out infinite alternate; transform-origin: 50% 40%; }
-  @keyframes flap { from { transform: scaleY(1); } to { transform: scaleY(-.55); } }
-  @keyframes fly {
-    0% { transform: translate(105vw, var(--y0, 120px)) scale(var(--s, 1)); }
-    50% { transform: translate(50vw, var(--y1, 60px)) scale(var(--s, 1)); }
-    100% { transform: translate(-10vw, var(--y2, 140px)) scale(var(--s, 1)); }
-  }
-  .stars { animation: twinkle 4s ease-in-out infinite alternate; }
-  @keyframes twinkle { to { opacity: .45; } }
   h1 { animation: flicker 7s infinite; }
   @keyframes flicker { 0%, 91%, 95%, 100% { opacity: 1; } 92%, 94% { opacity: .55; } }
 }
-@media (prefers-reduced-motion: reduce) {
-  .bat { display: none; }
-}
 @media (max-width: 560px) {
-  .hero { padding-block: 36px 150px; }
-  .ground { height: 120px; }
-  .moon { width: 110px; right: -24px; top: 14px; }
   .slab { padding: 52px 18px 22px; border-radius: 200px 200px 12px 12px / 90px 90px 12px 12px; }
   .slab label { font-size: 20px; }
 }
-</style>
+</style></style>
 
 <section class="hero" id="hero">
-  <div class="stars" aria-hidden="true"></div>
-  <div class="moon" aria-hidden="true"></div>
-  <div class="bat" aria-hidden="true" style="--dur:16s;--delay:-3s;--y0:150px;--y1:70px;--y2:120px;--s:1"><svg viewBox="-36 -18 72 30"><path fill="currentColor" d="M0-4 6-9 14-12 26-16 34-6 27-5 22 1 17-2 12 5 6 2 0 6-6 2-12 5-17-2-22 1-27-5-34-6-26-16-14-12-6-9Z"/></svg></div>
-  <div class="bat" aria-hidden="true" style="--dur:21s;--delay:-11s;--y0:60px;--y1:130px;--y2:40px;--s:.7"><svg viewBox="-36 -18 72 30"><path fill="currentColor" d="M0-4 6-9 14-12 26-16 34-6 27-5 22 1 17-2 12 5 6 2 0 6-6 2-12 5-17-2-22 1-27-5-34-6-26-16-14-12-6-9Z"/></svg></div>
-  <div class="bat" aria-hidden="true" style="--dur:12s;--delay:-7s;--y0:210px;--y1:170px;--y2:230px;--s:.55"><svg viewBox="-36 -18 72 30"><path fill="currentColor" d="M0-4 6-9 14-12 26-16 34-6 27-5 22 1 17-2 12 5 6 2 0 6-6 2-12 5-17-2-22 1-27-5-34-6-26-16-14-12-6-9Z"/></svg></div>
-  <div class="fog f1" aria-hidden="true"></div>
-  <div class="ground" aria-hidden="true">
-    <svg viewBox="0 0 1200 170" preserveAspectRatio="xMidYMax slice">
-      <path fill="currentColor" d="M0 120 Q150 95 300 112 T600 108 T900 104 T1200 112 V170 H0Z"/>
-      <g fill="currentColor">
-        <path d="M80 118 V70 a28 28 0 0 1 56 0 V118Z"/>
-        <path d="M200 112 V82 h-14 v-12 h14 v-16 h12 v16 h14 v12 h-14 v30Z"/>
-        <path d="M300 114 V60 q22 -30 44 0 V114Z"/>
-        <path d="M455 110 V80 a20 20 0 0 1 40 0 V110Z"/>
-        <path d="M720 108 V64 a26 26 0 0 1 52 0 V108Z"/>
-        <path d="M850 106 V76 h-12 v-10 h12 v-14 h10 v14 h12 v10 h-12 v30Z"/>
-        <path d="M960 110 V58 q26 -34 52 0 V110Z"/>
-        <path d="M1110 114 V84 a18 18 0 0 1 36 0 V114Z"/>
-        <path d="M1040 112 L1036 30 L1020 10 M1036 30 L1060 6 M1038 60 L1070 40" stroke="currentColor" stroke-width="7" fill="none" stroke-linecap="round"/>
-      </g>
-      <g fill="currentColor">
-        <rect x="0" y="96" width="1200" height="3"/>
-        <path d="M10 120V92l3-8 3 8v28zM40 120V92l3-8 3 8v28zM560 116V88l3-8 3 8v28zM590 116V88l3-8 3 8v28zM620 116V88l3-8 3 8v28zM650 116V88l3-8 3 8v28zM1170 120V92l3-8 3 8v28z"/>
-      </g>
-    </svg>
-  </div>
-  <div class="fog f2" aria-hidden="true"></div>
+  <canvas id="bgScene" width="1200" height="960" aria-hidden="true"></canvas>
   <div class="lantern" aria-hidden="true"></div>
-
   <div class="hero-in">
-    <p class="kicker">Ночь открытых могил · 31 октября</p>
     <h1>Кладбище <span>проектов</span></h1>
-    <p class="lede">Вставь ссылку на свой GitHub или GitLab. Мы раскопаем репозитории, к которым ты давно не прикасался, и поставим каждому надгробие. А тот, кто вдруг ожил после долгой спячки, полезет из-под земли.</p>
     <form class="slab" id="form" autocomplete="off">
       <label for="profile">Чьи проекты хороним?</label>
       <div class="row">
@@ -337,10 +290,23 @@ ul.graves .z { color: var(--slime); }
         <button class="dig" id="go" type="submit">Раскопать</button>
       </div>
     </form>
-    <div class="examples">Чужие кладбища: <button type="button" data-q="https://github.com/torvalds">torvalds</button><button type="button" data-q="https://github.com/sindresorhus">sindresorhus</button><button type="button" data-q="https://gitlab.com/inkscape">gitlab.com/inkscape</button><button type="button" id="demoBtn">выдуманный пример</button></div>
     <p class="status" id="status" role="status" aria-live="polite"></p>
   </div>
+  <button class="info-btn" id="infoBtn" type="button" aria-label="Как это работает" aria-haspopup="dialog">?</button>
 </section>
+
+<dialog class="about" id="about" aria-labelledby="aboutTitle">
+  <button class="close" id="closeAbout" type="button" aria-label="Закрыть">×</button>
+  <h2 id="aboutTitle">Как это работает</h2>
+  <p>Вставь ссылку на свой GitHub или GitLab. Мы раскопаем репозитории, к которым ты давно не прикасался, и поставим каждому надгробие. А тот, кто вдруг ожил после долгой спячки, полезет из-под земли.</p>
+  <ul class="rules">
+    <li><b>Надгробие</b> получает репозиторий без коммитов 6 месяцев и дольше, а также всё, что лежит в архиве. На камне даты рождения и последнего коммита.</li>
+    <li><b>Рука зомби</b> лезет из земли, если проект проспал 6+ месяцев, а потом в нём появился коммит за последние 45 дней.</li>
+    <li><b>Призрак</b> висит над самым древним покойником.</li>
+    <li>Форки не считаются: чужих покойников не хороним. Без токена GitHub даёт 60 запросов в час.</li>
+  </ul>
+  <div class="examples">Чужие кладбища: <button type="button" data-q="https://github.com/torvalds">torvalds</button><button type="button" data-q="https://github.com/sindresorhus">sindresorhus</button><button type="button" data-q="https://gitlab.com/inkscape">gitlab.com/inkscape</button><button type="button" id="demoBtn">выдуманный пример</button></div>
+</dialog>
 
 <section class="result" id="result" hidden>
   <div class="result-in">
@@ -353,21 +319,10 @@ ul.graves .z { color: var(--slime); }
       <button type="button" id="linkBtn">Скопировать ссылку</button>
     </div>
     <p class="toast" id="toast" aria-live="polite"></p>
-    <div class="cols">
-      <section>
-        <h3 id="listTitle">Покойные</h3>
-        <ul class="graves" id="list"></ul>
-      </section>
-      <section>
-        <h3>Правила кладбища</h3>
-        <ul class="rules">
-          <li><b>Надгробие</b> получает репозиторий без коммитов 6 месяцев и дольше, а также всё, что лежит в архиве. На камне даты рождения и последнего коммита.</li>
-          <li><b>Рука зомби</b> лезет из земли, если проект проспал 6+ месяцев, а потом в нём появился коммит за последние 45 дней.</li>
-          <li><b>Призрак</b> висит над самым древним покойником.</li>
-          <li>Форки не считаются: чужих покойников не хороним. Без токена GitHub даёт 60 запросов в час.</li>
-        </ul>
-      </section>
-    </div>
+    <section>
+      <h3 id="listTitle">Покойные</h3>
+      <ul class="graves" id="list"></ul>
+    </section>
   </div>
 </section>
 
@@ -383,11 +338,12 @@ ul.graves .z { color: var(--slime); }
   const $ = (id) => document.getElementById(id);
   const canvas = $("scene");
   const mainCtx = canvas.getContext("2d");
+  const bgCanvas = $("bgScene");
+  const bgCtx = bgCanvas.getContext("2d");
   let ctx = mainCtx;
   const statusEl = $("status");
   const toastEl = $("toast");
   let current = null;
-  let scene = null;
 
   // ---------- helpers ----------
   function hashStr(s) { let h = 2166136261; for (const c of s) { h ^= c.charCodeAt(0); h = Math.imul(h, 16777619); } return h >>> 0; }
@@ -730,7 +686,9 @@ ul.graves .z { color: var(--slime); }
     let ty = type === 2 ? -h * 0.6 : -h * 0.7;
     engrave("R.I.P.", 0, ty, `700 ${Math.round(16 * s)}px ${STONE_FONT}`);
     ty += 26 * s;
-    if (item.empty) {
+    if (item.blank) {
+      // decorative stone on the landing scene
+    } else if (item.empty) {
       engrave("здесь пока", 0, ty, `700 ${Math.round(17 * s)}px ${STONE_FONT}`);
       engrave("никого", 0, ty + 22 * s, `700 ${Math.round(17 * s)}px ${STONE_FONT}`);
     } else {
@@ -858,7 +816,7 @@ ul.graves .z { color: var(--slime); }
     prm.clods.forEach(([dx, dy, rr, dark]) => { ctx.fillStyle = dark ? C.dirt : C.dirtHi; ctx.beginPath(); ctx.arc(dx * 120 * s, dy * s, rr * s, 0, Math.PI * 2); ctx.fill(); });
 
     // wooden sign
-    if (rise > 0.6) {
+    if (rise > 0.6 && item.name) {
       ctx.globalAlpha = Math.min(1, (rise - 0.6) / 0.4);
       const sx = 92 * s, pw = 136 * s, ph = 58 * s;
       ctx.fillStyle = "#4a3220"; ctx.fillRect(sx - 4 * s, -70 * s, 8 * s, 78 * s);
@@ -1024,10 +982,12 @@ ul.graves .z { color: var(--slime); }
     const r = rngFrom(hashStr(data.who + data.hostLabel));
     const bg = off();
     withCtx(bg, () => { drawSkyStatic(); drawHills(r); drawTree(r); drawFence(r); drawGround(); drawBushes(r); });
-    const items = [
-      ...data.zombies.map((z) => ({ ...z, kind: "zombie" })),
-      ...data.graves.map((g) => ({ ...g, kind: "grave" })),
-    ];
+    const items = data.landing
+      ? [{ kind: "zombie", blank: true }, ...Array.from({ length: 11 }, () => ({ kind: "grave", blank: true }))]
+      : [
+        ...data.zombies.map((z) => ({ ...z, kind: "zombie" })),
+        ...data.graves.map((g) => ({ ...g, kind: "grave" })),
+      ];
     if (!items.length) items.push({ kind: "grave", empty: true });
     const placed = layout(items, r);
     const rows = [off(), off(), off()];
@@ -1042,7 +1002,7 @@ ul.graves .z { color: var(--slime); }
       if (!p.it.empty && p.it === items.find((it) => it.kind === "grave")) ghost = { x: p.x, y: p.y - 250 * p.s, s: p.s, ri: p.ri };
     });
     const top = off();
-    withCtx(top, () => drawHeader(data));
+    if (!data.landing) withCtx(top, () => drawHeader(data));
     return {
       bg, rows, top, hands, candles, ghost,
       stars: Array.from({ length: 170 }, () => ({ x: r() * W, y: r() * 430, s: r() * 1.7 + 0.3, a: 0.25 + r() * 0.6, ph: r() * 10, sp: 0.6 + r() * 2.5 })),
@@ -1064,9 +1024,9 @@ ul.graves .z { color: var(--slime); }
     return 1 - Math.pow(1 - k, 3);
   }
 
-  function frame(t, opts = {}) {
-    const sc = scene; if (!sc) return;
-    ctx = mainCtx;
+  function frame(sc, target, t, opts = {}) {
+    if (!sc) return;
+    ctx = target;
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.globalAlpha = 1;
     ctx.drawImage(sc.bg, 0, 0);
@@ -1081,7 +1041,7 @@ ul.graves .z { color: var(--slime); }
       if (t >= sc.boltAt && (!sc.bolt || sc.bolt.t0 !== sc.boltAt)) sc.bolt = { ...makeBolt(), t0: sc.boltAt };
       if (sc.bolt) {
         flash = flashLevel(t - sc.bolt.t0);
-        if (t - sc.bolt.t0 > 1.2) { sc.boltAt = sc.nextBolt; sc.nextBolt += 7 + Math.random() * 7; sc.bolt = null; }
+        if (t - sc.bolt.t0 > 1.2) { sc.boltAt = Math.max(sc.nextBolt, t + 4); sc.nextBolt = sc.boltAt + 7 + Math.random() * 7; sc.bolt = null; }
       }
       if (sc.bolt && flash > 0.05) {
         ctx.save(); ctx.strokeStyle = `rgba(235,235,255,${flash})`; ctx.shadowColor = "rgba(190,200,255,1)"; ctx.shadowBlur = 24; ctx.lineJoin = "round";
@@ -1127,23 +1087,39 @@ ul.graves .z { color: var(--slime); }
     if (flash > 0) { ctx.fillStyle = `rgba(215,220,255,${0.3 * flash})`; ctx.fillRect(0, 0, W, H); }
   }
 
-  let raf = 0, t0 = 0;
+  // Both the landing scene and the result scene animate, each only while on screen.
+  const views = {
+    bg: { sc: null, t0: 0, ctx: bgCtx, el: bgCanvas, visible: true },
+    res: { sc: null, t0: 0, ctx: mainCtx, el: canvas, visible: false },
+  };
+  let raf = 0, recording = false;
   function loop(now) {
-    if (!scene) return;
-    frame((now - t0) / 1000);
-    raf = requestAnimationFrame(loop);
+    raf = 0;
+    if (document.hidden) return;
+    let any = false;
+    for (const v of Object.values(views)) {
+      if (!v.sc || !v.visible) continue;
+      if (REDUCED && !(recording && v === views.res)) continue;
+      frame(v.sc, v.ctx, (now - v.t0) / 1000);
+      any = true;
+    }
+    if (any) raf = requestAnimationFrame(loop);
   }
-  function startLoop() {
-    cancelAnimationFrame(raf);
-    if (REDUCED) { frame(10, { still: true }); return; }
-    t0 = performance.now();
-    raf = requestAnimationFrame(loop);
+  function kick() { if (!raf) raf = requestAnimationFrame(loop); }
+  function startView(v, sc) {
+    v.sc = sc;
+    v.t0 = performance.now();
+    if (REDUCED) frame(sc, v.ctx, 10, { still: true });
+    kick();
   }
-  document.addEventListener("visibilitychange", () => {
-    if (!scene || REDUCED) return;
-    if (document.hidden) cancelAnimationFrame(raf);
-    else { const elapsed = Math.max(4, (performance.now() - t0) / 1000); t0 = performance.now() - elapsed * 1000; raf = requestAnimationFrame(loop); }
-  });
+  if ("IntersectionObserver" in window) {
+    const io = new IntersectionObserver((entries) => {
+      for (const e of entries) (e.target === bgCanvas ? views.bg : views.res).visible = e.isIntersecting;
+      kick();
+    });
+    io.observe(bgCanvas); io.observe(canvas);
+  } else views.res.visible = true;
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) kick(); });
 
   // ---------- page ----------
   function renderList(data) {
@@ -1162,12 +1138,11 @@ ul.graves .z { color: var(--slime); }
 
   function show(data) {
     current = data;
-    scene = buildScene(data);
     $("result").hidden = false;
+    startView(views.res, buildScene(data));
     $("resultTitle").textContent = data.demo ? "Кладбище example-dev" : `Кладбище ${data.who}`;
     renderList(data);
     canvas.setAttribute("aria-label", `Кладбище проектов ${data.who}: надгробий ${data.graves.length}, восставших ${data.zombies.length}, живых ${data.alive.length}`);
-    startLoop();
     requestAnimationFrame(() => $("result").scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }));
   }
 
@@ -1190,7 +1165,7 @@ ul.graves .z { color: var(--slime); }
 
   // ---------- saving and sharing ----------
   function snapshotBlob() {
-    frame(Math.max(6, (performance.now() - t0) / 1000), { still: true });
+    frame(views.res.sc, mainCtx, Math.max(6, (performance.now() - views.res.t0) / 1000), { still: true });
     return new Promise((res) => canvas.toBlob(res, "image/png"));
   }
   const baseName = () => `graveyard-${(current?.who || "projects").replace(/[^A-Za-z0-9-]/g, "_")}`;
@@ -1218,7 +1193,6 @@ ul.graves .z { color: var(--slime); }
     else if (res === "failed") toast("Сохранить не получилось. Можно сделать скриншот.");
   }
 
-  let recording = false;
   async function saveVideo() {
     if (recording) return;
     const types = ["video/mp4;codecs=avc1", "video/mp4", "video/webm;codecs=vp9", "video/webm"];
@@ -1226,8 +1200,9 @@ ul.graves .z { color: var(--slime); }
     if (!type || !canvas.captureStream) { toast("Этот браузер не умеет записывать видео. Сохраните картинку."); return; }
     recording = true;
     const btn = $("videoBtn"); btn.disabled = true;
-    if (REDUCED) { t0 = performance.now(); raf = requestAnimationFrame(loop); }
-    else t0 = performance.now(); // restart so the clip opens with the lightning reveal
+    views.res.t0 = performance.now(); // restart so the clip opens with the lightning reveal
+    views.res.sc.boltAt = 0.12;
+    kick();
     const stream = canvas.captureStream(30);
     const rec = new MediaRecorder(stream, { mimeType: type, videoBitsPerSecond: 5e6 });
     const chunks = [];
@@ -1237,8 +1212,8 @@ ul.graves .z { color: var(--slime); }
     for (let left = 8; left > 0; left--) { btn.textContent = `Записываю… ${left}`; await new Promise((r) => setTimeout(r, 1000)); }
     rec.stop(); await done;
     stream.getTracks().forEach((tr) => tr.stop());
-    if (REDUCED) { cancelAnimationFrame(raf); frame(10, { still: true }); }
     btn.textContent = "Сохранить видео"; btn.disabled = false; recording = false;
+    if (REDUCED) frame(views.res.sc, mainCtx, 10, { still: true });
     const ext = type.startsWith("video/mp4") ? "mp4" : "webm";
     const res = await offerFile(new Blob(chunks, { type: type.split(";")[0] }), `${baseName()}.${ext}`);
     if (res === "saved") toast(`Видео сохранено (${ext}).`);
@@ -1264,8 +1239,13 @@ ul.graves .z { color: var(--slime); }
   }
 
   $("form").addEventListener("submit", (e) => { e.preventDefault(); run($("profile").value); });
-  document.querySelectorAll("[data-q]").forEach((b) => b.addEventListener("click", () => { $("profile").value = b.dataset.q; run(b.dataset.q); }));
-  $("demoBtn").addEventListener("click", () => { setStatus("Это выдуманный пример, проекты ненастоящие."); show(demoData()); });
+  const about = $("about");
+  const closeAbout = () => { if (about.open) about.close(); };
+  $("infoBtn").addEventListener("click", () => { try { about.showModal(); } catch (e) { about.setAttribute("open", ""); } });
+  $("closeAbout").addEventListener("click", closeAbout);
+  about.addEventListener("click", (e) => { if (e.target === about) closeAbout(); });
+  document.querySelectorAll("[data-q]").forEach((b) => b.addEventListener("click", () => { closeAbout(); $("profile").value = b.dataset.q; run(b.dataset.q); }));
+  $("demoBtn").addEventListener("click", () => { closeAbout(); setStatus("Это выдуманный пример, проекты ненастоящие."); show(demoData()); });
   $("saveBtn").addEventListener("click", saveImage);
   $("videoBtn").addEventListener("click", saveVideo);
   $("shareBtn").addEventListener("click", share);
@@ -1293,6 +1273,7 @@ ul.graves .z { color: var(--slime); }
         new Promise((res) => setTimeout(res, 2500)),
       ]);
     } catch (e) {}
+    startView(views.bg, buildScene({ landing: true, who: "landing", hostLabel: "", graves: [], zombies: [], alive: [] }));
     const q = fromHash();
     if (q) { $("profile").value = q; run(q); }
   }
